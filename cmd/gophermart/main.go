@@ -7,5 +7,5 @@ import (
 func main() {
 	logger.NewLogs()
 	defer logger.Close()
-	logger.Info("Поехали")
+	logger.Info("Старт сервера")
 }
