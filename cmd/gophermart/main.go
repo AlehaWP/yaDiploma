@@ -1,7 +1,11 @@
 package main
 
-import "fmt"
+import (
+	"github.com/AlehaWP/yaDiploma.git/pkg/logger"
+)
 
 func main() {
-	fmt.Println("Поехали")
+	logger.NewLogs()
+	defer logger.Close()
+	logger.Info("Поехали")
 }
