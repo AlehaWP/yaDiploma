@@ -25,7 +25,9 @@ func Info(v ...interface{}) {
 }
 
 func Error(v ...interface{}) {
-	infoLog.Fatal(v...)
+	infoLog.Println("ERROR")
+	infoLog.Println(v...)
+	errorLog.Fatal(v...)
 }
 
 func createLogs() {
@@ -42,7 +44,7 @@ func createLogs() {
 		log.Fatal(err)
 	}
 
-	errorLog = log.New(fInfo, "INFO\t", log.Ldate|log.Ltime)
+	errorLog = log.New(fError, "ERROR\t", log.Ldate|log.Ltime)
 }
 
 func NewLogs() {
