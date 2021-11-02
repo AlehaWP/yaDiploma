@@ -8,7 +8,7 @@ import (
 	"github.com/AlehaWP/yaDiploma.git/internal/models"
 )
 
-var userRepo models.UserRepo
+var userRepo models.UsersRepo
 
 func CheckAuthorization(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

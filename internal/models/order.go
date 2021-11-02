@@ -1,8 +1,9 @@
 package models
 
 type Order struct {
-	Id    string
-	Bonus float32
+	Id     string
+	Bonus  float32
+	UserID int
 }
 
 type OrderRepo interface {

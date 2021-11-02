@@ -3,6 +3,7 @@ module github.com/AlehaWP/yaDiploma.git
 go 1.17
 
 require (
+	github.com/caarlos0/env/v6 v6.7.2
 	github.com/go-chi/chi/v5 v5.0.5
 	github.com/lib/pq v1.10.3
 	github.com/pressly/goose/v3 v3.3.1

@@ -5,7 +5,7 @@ type Customer struct {
 	Balance float32
 }
 
-type CustomerRepo interface {
+type CustomersRepo interface {
 	Find(string) bool
 	Add(Customer) error
 	Del(string) bool
