@@ -13,7 +13,7 @@ type DBUserRepo struct {
 	serverDB
 }
 
-func (d DBUserRepo) Locate(ctx context.Context, u *models.User) bool {
+func (d DBUserRepo) Locate(ctx context.Context, u *models.User) (bool, error) {
 	db := d.db
 	ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
 	defer cancelfunc()
@@ -22,19 +22,19 @@ func (d DBUserRepo) Locate(ctx context.Context, u *models.User) bool {
 
 	if err := row.Scan(&u.UserID, &u.Login, &u.Token, &u.Password); err != nil {
 		logger.Info(err)
-		return false
+		return false, err
 	}
 	if u.UserID == 0 {
-		return false
+		return false, nil
 	}
 	if len(u.Token) == 0 {
 		u.Token = encription.EncriptStr(u.Login)
 		d.update(ctx, u)
 	}
-	return true
+	return true, nil
 }
 
-func (d DBUserRepo) Add(ctx context.Context, u *models.User) bool {
+func (d DBUserRepo) Add(ctx context.Context, u *models.User) (bool, error) {
 	db := d.db
 	ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
 	defer cancelfunc()
@@ -45,9 +45,9 @@ func (d DBUserRepo) Add(ctx context.Context, u *models.User) bool {
 	_, err := db.ExecContext(ctx, q, u.Login, u.Password, u.Token)
 
 	if err != nil {
-		return false
+		return false, err
 	}
-	return true
+	return true, nil
 }
 
 func (d DBUserRepo) update(ctx context.Context, u *models.User) bool {
@@ -66,8 +66,8 @@ func (d DBUserRepo) update(ctx context.Context, u *models.User) bool {
 	return true
 }
 
-func (d DBUserRepo) Del(ctx context.Context, u *models.User) bool {
-	return false
+func (d DBUserRepo) Del(ctx context.Context, u *models.User) (bool, error) {
+	return false, nil
 }
 
 func NewDBUserRepo() models.UsersRepo {

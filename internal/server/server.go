@@ -7,6 +7,7 @@ import (
 
 	"github.com/AlehaWP/yaDiploma.git/internal/config"
 	"github.com/AlehaWP/yaDiploma.git/internal/handlers"
+	"github.com/AlehaWP/yaDiploma.git/internal/middlewares"
 	"github.com/AlehaWP/yaDiploma.git/pkg/logger"
 	"github.com/go-chi/chi/v5"
 )
@@ -21,8 +22,10 @@ func (s *Server) Start(ctx context.Context) {
 	r := chi.NewRouter()
 	// handlers.NewHandlers(repo, opt)
 	// middlewares.NewCookie(repo)
+	r.Use(middlewares.ZipHandlerRead, middlewares.ZipHandlerWrite)
 	r.Post("/api/user/register", handlers.HandlerRegistration)
-	//r.Use(middlewares.CheckAuthorization, middlewares.ZipHandlerRead, middlewares.ZipHandlerWrite)
+	r.Post("/api/user/login", handlers.HandlerLogin)
+	// r.Use(middlewares.CheckAuthorization)
 	// //r.Use(middlewares.ZipHandlerRead, middlewares.ZipHandlerWrite)
 
 	// r.Get("/user/urls", handlers.HandlerUserPostURLs)
