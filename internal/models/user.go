@@ -7,16 +7,14 @@ type UserKeyName string
 const UKeyName UserKeyName = "UserUID"
 
 type User struct {
-	Login    string
-	Password string
+	Login    string `json:"login"`
+	Password string `json:"password"`
 	Token    string
 	UserID   int
 }
 
 type UsersRepo interface {
-	Find(context.Context) bool
-	SignIn(context.Context) bool
-	Add(context.Context) bool
-	Del(string) bool
-	Get(string) User
+	Locate(context.Context, User) (User, bool)
+	Add(context.Context, User) (User, bool)
+	Del(context.Context, User) bool
 }

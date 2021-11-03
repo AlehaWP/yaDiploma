@@ -8,53 +8,32 @@ import (
 	"github.com/AlehaWP/yaDiploma.git/pkg/encription"
 )
 
-type UserRepo struct {
+type DBUserRepo struct {
 	serverDB
-	models.User
 }
 
-func (u UserRepo) Find(ctx context.Context) bool {
-	db := u.db
+func (d DBUserRepo) Locate(ctx context.Context, u models.User) (models.User, bool) {
+	db := d.db
 	ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
 	defer cancelfunc()
-	q := `SELECT id FROM users WHERE user_token=$1 OR user_name=$2`
-	var id int
+	q := `SELECT id, user_name, user_token, user_password FROM users WHERE user_token=$1 OR user_name=$2`
 	row := db.QueryRowContext(ctx, q, u.Token, u.Login)
 
-	if err := row.Scan(&id); err != nil {
-		return false
+	if err := row.Scan(u.UserID, u.Login, u.Token, u.Password); err != nil {
+		return u, false
 	}
-	if id == 0 {
-		return false
+	if u.UserID == 0 {
+		return u, false
 	}
-	return true
-}
-
-func (u UserRepo) SignIn(ctx context.Context) bool {
-	db := u.db
-	ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
-	defer cancelfunc()
-	q := `SELECT id, user_token FROM users WHERE user_name=$1 and user_password=$2`
-	var (
-		token string
-		id    int
-	)
-	row := db.QueryRowContext(ctx, q, u.Login, u.Password)
-
-	if err := row.Scan(&id, &token); err != nil {
-		return false
-	}
-	if id == 0 {
-		return false
-	}
-	if len(token) == 0 {
+	if len(u.Token) == 0 {
 		u.Token = encription.EncriptStr(u.Login)
+		d.update(ctx, u)
 	}
-	return true
+	return u, true
 }
 
-func (u UserRepo) Add(ctx context.Context) bool {
-	db := u.db
+func (d DBUserRepo) Add(ctx context.Context, u models.User) (models.User, bool) {
+	db := d.db
 	ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
 	defer cancelfunc()
 
@@ -64,7 +43,33 @@ func (u UserRepo) Add(ctx context.Context) bool {
 	_, err := db.ExecContext(ctx, q, u.Login, u.Password, u.Token)
 
 	if err != nil {
+		return u, false
+	}
+	return u, true
+}
+
+func (d DBUserRepo) update(ctx context.Context, u models.User) bool {
+	db := d.db
+	ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
+	defer cancelfunc()
+
+	u.Token = encription.EncriptStr(u.Login)
+
+	q := `UPDATE users SET user_name=$2, user_password=$3, user_token=$4 WHERE ID=$4`
+	_, err := db.ExecContext(ctx, q, u.UserID, u.Login, u.Password, u.Token)
+
+	if err != nil {
 		return false
 	}
 	return true
+}
+
+func (d DBUserRepo) Del(ctx context.Context, u models.User) bool {
+	return false
+}
+
+func NewDBUserRepo(u *models.User) models.UsersRepo {
+	ur := new(DBUserRepo)
+	ur.serverDB = sr
+	return ur
 }

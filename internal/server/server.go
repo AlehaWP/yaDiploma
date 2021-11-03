@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/AlehaWP/yaDiploma.git/internal/middlewares"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -18,7 +19,7 @@ func (s *Server) Start() {
 	r := chi.NewRouter()
 	// handlers.NewHandlers(repo, opt)
 	// middlewares.NewCookie(repo)
-	// r.Use(middlewares.SetCookieUser, middlewares.ZipHandlerRead, middlewares.ZipHandlerWrite)
+	r.Use(middlewares.CheckAuthorization, middlewares.ZipHandlerRead, middlewares.ZipHandlerWrite)
 	// //r.Use(middlewares.ZipHandlerRead, middlewares.ZipHandlerWrite)
 
 	// r.Get("/user/urls", handlers.HandlerUserPostURLs)
