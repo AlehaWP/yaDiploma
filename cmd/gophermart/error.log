@@ -1,0 +1,2 @@
+ERROR	2021/11/04 01:28:13 Ошибка подключения к БДsql: unknown driver "postgres" (forgotten import?)
+ERROR	2021/11/04 01:29:10 Ошибка подключения к БДdial tcp [::1]:5432: connect: connection refused
