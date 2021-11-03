@@ -14,7 +14,7 @@ type User struct {
 }
 
 type UsersRepo interface {
-	Locate(context.Context, User) (User, bool)
-	Add(context.Context, User) (User, bool)
-	Del(context.Context, User) bool
+	Locate(context.Context, *User) bool
+	Add(context.Context, *User) bool
+	Del(context.Context, *User) bool
 }

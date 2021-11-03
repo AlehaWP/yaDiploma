@@ -5,7 +5,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/AlehaWP/yaDiploma.git/internal/middlewares"
+	"github.com/AlehaWP/yaDiploma.git/internal/config"
+	"github.com/AlehaWP/yaDiploma.git/internal/handlers"
+	"github.com/AlehaWP/yaDiploma.git/pkg/logger"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -15,11 +17,12 @@ type Server struct {
 
 //Start server with router.
 // func (s *Server) Start(ctx context.Context, repo models.Repository, opt models.Options) {
-func (s *Server) Start() {
+func (s *Server) Start(ctx context.Context) {
 	r := chi.NewRouter()
 	// handlers.NewHandlers(repo, opt)
 	// middlewares.NewCookie(repo)
-	r.Use(middlewares.CheckAuthorization, middlewares.ZipHandlerRead, middlewares.ZipHandlerWrite)
+	r.Post("/api/user/register", handlers.HandlerRegistration)
+	//r.Use(middlewares.CheckAuthorization, middlewares.ZipHandlerRead, middlewares.ZipHandlerWrite)
 	// //r.Use(middlewares.ZipHandlerRead, middlewares.ZipHandlerWrite)
 
 	// r.Get("/user/urls", handlers.HandlerUserPostURLs)
@@ -33,11 +36,12 @@ func (s *Server) Start() {
 	// r.Post("/api/shorten/batch", handlers.HandlerAPIURLsPost)
 	// r.Delete("/api/user/urls", handlers.HandlerDeleteUserUrls)
 
-	// s.Addr = opt.ServAddr()
+	s.Addr = config.Cfg.ServAddr()
+	logger.Info("Старт сервера по адресу", config.Cfg.ServAddr())
 	s.Handler = r
 	go s.ListenAndServe()
 
-	// <-ctx.Done()
+	<-ctx.Done()
 	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancelFunc()
 	s.Shutdown(ctx)

@@ -6,33 +6,35 @@ import (
 
 	"github.com/AlehaWP/yaDiploma.git/internal/models"
 	"github.com/AlehaWP/yaDiploma.git/pkg/encription"
+	"github.com/AlehaWP/yaDiploma.git/pkg/logger"
 )
 
 type DBUserRepo struct {
 	serverDB
 }
 
-func (d DBUserRepo) Locate(ctx context.Context, u models.User) (models.User, bool) {
+func (d DBUserRepo) Locate(ctx context.Context, u *models.User) bool {
 	db := d.db
 	ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
 	defer cancelfunc()
 	q := `SELECT id, user_name, user_token, user_password FROM users WHERE user_token=$1 OR user_name=$2`
 	row := db.QueryRowContext(ctx, q, u.Token, u.Login)
 
-	if err := row.Scan(u.UserID, u.Login, u.Token, u.Password); err != nil {
-		return u, false
+	if err := row.Scan(&u.UserID, &u.Login, &u.Token, &u.Password); err != nil {
+		logger.Info(err)
+		return false
 	}
 	if u.UserID == 0 {
-		return u, false
+		return false
 	}
 	if len(u.Token) == 0 {
 		u.Token = encription.EncriptStr(u.Login)
 		d.update(ctx, u)
 	}
-	return u, true
+	return true
 }
 
-func (d DBUserRepo) Add(ctx context.Context, u models.User) (models.User, bool) {
+func (d DBUserRepo) Add(ctx context.Context, u *models.User) bool {
 	db := d.db
 	ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
 	defer cancelfunc()
@@ -43,12 +45,12 @@ func (d DBUserRepo) Add(ctx context.Context, u models.User) (models.User, bool) 
 	_, err := db.ExecContext(ctx, q, u.Login, u.Password, u.Token)
 
 	if err != nil {
-		return u, false
+		return false
 	}
-	return u, true
+	return true
 }
 
-func (d DBUserRepo) update(ctx context.Context, u models.User) bool {
+func (d DBUserRepo) update(ctx context.Context, u *models.User) bool {
 	db := d.db
 	ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
 	defer cancelfunc()
@@ -64,11 +66,11 @@ func (d DBUserRepo) update(ctx context.Context, u models.User) bool {
 	return true
 }
 
-func (d DBUserRepo) Del(ctx context.Context, u models.User) bool {
+func (d DBUserRepo) Del(ctx context.Context, u *models.User) bool {
 	return false
 }
 
-func NewDBUserRepo(u *models.User) models.UsersRepo {
+func NewDBUserRepo() models.UsersRepo {
 	ur := new(DBUserRepo)
 	ur.serverDB = sr
 	return ur

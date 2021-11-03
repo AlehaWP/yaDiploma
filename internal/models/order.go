@@ -6,7 +6,7 @@ type Order struct {
 	UserID int
 }
 
-type OrderRepo interface {
+type OrdersRepo interface {
 	Get(id string) Order
 	Add(Order) error
 }

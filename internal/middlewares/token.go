@@ -15,9 +15,6 @@ func CheckAuthorization(next http.Handler) http.Handler {
 		tokenName := "bearer "
 		t := r.Header.Get("Authorization")
 		key := ""
-
-		// re := regexp.MustCompile(`Bearer\s(.+)`)
-		// st := re.FindStringSubmatch(t) //FindAString(t)
 		if strings.HasPrefix(strings.ToLower(t), tokenName) {
 			key = t[len(tokenName):]
 		}
@@ -31,13 +28,3 @@ func CheckAuthorization(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
-
-// cv := ""
-// if err == nil {
-// 	cv = c.Value
-// }
-// if ok := userRepo.Find(cv); !ok {
-// 	w.WriteHeader(http.StatusUnauthorized)
-// 	return
-// }
-// bearer := "Bearer " + encription.EncriptStr(cv)

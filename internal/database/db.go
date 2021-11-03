@@ -6,6 +6,8 @@ import (
 	"sync"
 	"time"
 
+	_ "github.com/lib/pq"
+
 	"github.com/AlehaWP/yaDiploma.git/internal/config"
 	"github.com/AlehaWP/yaDiploma.git/pkg/logger"
 )
@@ -34,11 +36,14 @@ func connect() {
 	if err != nil {
 		logger.Error("Ошибка подключения к БД", err)
 	}
-	sr := new(serverDB)
 	sr.db = db
 	sr.CheckDBConnection(ctx)
 }
 
-func NewDB() {
+func OpenDBConnect() {
 	once.Do(connect)
+}
+
+func Close() {
+	sr.db.Close()
 }
