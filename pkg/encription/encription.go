@@ -5,6 +5,8 @@ import (
 	"crypto/md5"
 	"crypto/rand"
 	"fmt"
+
+	"github.com/AlehaWP/yaDiploma.git/pkg/logger"
 )
 
 const blockSize int = aes.BlockSize
@@ -23,10 +25,12 @@ func EncriptStr(s string) string {
 	key, err := generateRandom(blockSize)
 
 	if err != nil {
+		logger.Info("Ошибка создания токена для пользователя ", s, err)
 		return ""
 	}
 	aesB, err := aes.NewCipher(key)
 	if err != nil {
+		logger.Info("Ошибка создания токена для пользователя ", s, err)
 		return ""
 	}
 

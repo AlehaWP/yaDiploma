@@ -2,7 +2,6 @@ package config
 
 import (
 	"flag"
-	"fmt"
 	"os"
 	"sync"
 
@@ -14,9 +13,10 @@ var Cfg *Config
 var once sync.Once
 
 type Config struct {
-	servAddr     string
-	dbConnString string
-	appDir       string
+	servAddr       string
+	dbConnString   string
+	accuralAddress string
+	appDir         string
 }
 
 func (c Config) ServAddr() string {
@@ -31,9 +31,14 @@ func (c Config) ProgramPath() string {
 	return c.appDir
 }
 
+func (c Config) AccuralAddress() string {
+	return c.accuralAddress
+}
+
 type EnvOptions struct {
-	ServAddr     string `env:"SERVER_ADDRESS"`
-	DBConnString string `env:"DATABASE_DSN"`
+	ServAddr       string `env:"RUN_ADDRESS"`
+	DBConnString   string `env:"DATABASE_URI"`
+	AccuralAddress string `env:"ACCRUAL_SYSTEM_ADDRESS"`
 }
 
 //checkEnv for get options from env to default application options.
@@ -42,7 +47,7 @@ func (c *Config) checkEnv() {
 	e := &EnvOptions{}
 	err := env.Parse(e)
 	if err != nil {
-		fmt.Println(err.Error())
+		logger.Info("Ошибка чтения конфигурации из переменного окружения", err)
 	}
 	if len(e.ServAddr) != 0 {
 		c.servAddr = e.ServAddr
@@ -56,6 +61,7 @@ func (c *Config) checkEnv() {
 func (c *Config) setFlags() {
 	flag.StringVar(&c.servAddr, "a", "localhost:8080", "a server address string")
 	flag.StringVar(&c.dbConnString, "d", "user=kseikseich dbname=yad sslmode=disable", "a db connection string")
+	flag.StringVar(&c.accuralAddress, "r", "http://localhost:8081", "a accural system address")
 	flag.Parse()
 }
 
