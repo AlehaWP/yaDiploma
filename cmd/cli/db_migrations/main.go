@@ -22,7 +22,7 @@ func main() {
 	}
 	// setup database
 	logger.Info(p, "Применение миграций")
-	if err := goose.Up(db, "../../db/migrations"); err != nil {
+	if err := goose.Up(db, "../../../db/migrations"); err != nil {
 		logger.Error(p, err)
 	}
 	logger.Info(p, "Завершение") // run app
