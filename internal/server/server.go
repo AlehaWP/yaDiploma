@@ -8,12 +8,14 @@ import (
 	"github.com/AlehaWP/yaDiploma.git/internal/config"
 	"github.com/AlehaWP/yaDiploma.git/internal/handlers"
 	"github.com/AlehaWP/yaDiploma.git/internal/middlewares"
+	"github.com/AlehaWP/yaDiploma.git/internal/models"
 	"github.com/AlehaWP/yaDiploma.git/pkg/logger"
 	"github.com/go-chi/chi/v5"
 )
 
 type Server struct {
 	http.Server
+	models.ServerDB
 }
 
 //Start server with router.
@@ -23,8 +25,8 @@ func (s *Server) Start(ctx context.Context) {
 	// handlers.NewHandlers(repo, opt)
 	// middlewares.NewCookie(repo)
 	r.Use(middlewares.ZipHandlerRead, middlewares.ZipHandlerWrite)
-	r.Post("/api/user/register", handlers.HandlerRegistration)
-	r.Post("/api/user/login", handlers.HandlerLogin)
+	r.Post("/api/user/register", handlers.HandlerRegistration(s.NewDBUserRepo()))
+	r.Post("/api/user/login", handlers.HandlerLogin(s.NewDBUserRepo()))
 	// r.Use(middlewares.CheckAuthorization)
 	// //r.Use(middlewares.ZipHandlerRead, middlewares.ZipHandlerWrite)
 

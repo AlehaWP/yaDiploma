@@ -13,8 +13,7 @@ type DBUserRepo struct {
 	serverDB
 }
 
-func (d DBUserRepo) Locate(ctx context.Context, u *models.User) (bool, error) {
-	db := d.db
+func (db DBUserRepo) Locate(ctx context.Context, u *models.User) (bool, error) {
 	ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
 	defer cancelfunc()
 	q := `SELECT id, user_name, user_token, user_password FROM users WHERE user_token=$1 OR user_name=$2`
@@ -29,13 +28,12 @@ func (d DBUserRepo) Locate(ctx context.Context, u *models.User) (bool, error) {
 	}
 	if len(u.Token) == 0 {
 		u.Token = encription.EncriptStr(u.Login)
-		d.update(ctx, u)
+		db.update(ctx, u)
 	}
 	return true, nil
 }
 
-func (d DBUserRepo) Add(ctx context.Context, u *models.User) (bool, error) {
-	db := d.db
+func (db DBUserRepo) Add(ctx context.Context, u *models.User) (bool, error) {
 	ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
 	defer cancelfunc()
 
@@ -50,8 +48,7 @@ func (d DBUserRepo) Add(ctx context.Context, u *models.User) (bool, error) {
 	return true, nil
 }
 
-func (d DBUserRepo) update(ctx context.Context, u *models.User) bool {
-	db := d.db
+func (db DBUserRepo) update(ctx context.Context, u *models.User) bool {
 	ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
 	defer cancelfunc()
 
@@ -66,12 +63,12 @@ func (d DBUserRepo) update(ctx context.Context, u *models.User) bool {
 	return true
 }
 
-func (d DBUserRepo) Del(ctx context.Context, u *models.User) (bool, error) {
+func (db DBUserRepo) Del(ctx context.Context, u *models.User) (bool, error) {
 	return false, nil
 }
 
-func NewDBUserRepo() models.UsersRepo {
+func (s serverDB) NewDBUserRepo() models.UsersRepo {
 	ur := new(DBUserRepo)
-	ur.serverDB = sr
+	ur.serverDB = s
 	return ur
 }

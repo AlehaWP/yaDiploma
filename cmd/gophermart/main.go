@@ -19,12 +19,13 @@ func main() {
 	defer cancel()
 	config.NewConfig()
 
-	database.OpenDBConnect()
-	defer database.Close()
+	sDB := database.OpenDBConnect()
+	defer sDB.Close()
 
 	go os_signal.HandleQuit(cancel)
 
 	s := new(server.Server)
+	s.ServerDB = sDB
 	s.Start(ctx)
 
 	<-ctx.Done()

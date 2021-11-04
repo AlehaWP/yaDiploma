@@ -5,7 +5,6 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/AlehaWP/yaDiploma.git/internal/database"
 	"github.com/AlehaWP/yaDiploma.git/internal/models"
 	"github.com/AlehaWP/yaDiploma.git/pkg/logger"
 )
@@ -27,69 +26,70 @@ func getUserFromRequest(r *http.Request) (*models.User, bool) {
 	return user, true
 }
 
-func HandlerRegistration(w http.ResponseWriter, r *http.Request) {
-	logger.Info("Обработка запроса регистрации")
-	ctx := r.Context()
+func HandlerRegistration(ur models.UsersRepo) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		logger.Info("Обработка запроса регистрации")
+		ctx := r.Context()
 
-	user, ok := getUserFromRequest(r)
-	if !ok {
-		logger.Info(http.StatusBadRequest)
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	userRepo := database.NewDBUserRepo()
+		user, ok := getUserFromRequest(r)
+		if !ok {
+			logger.Info(http.StatusBadRequest)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
 
-	finded, err := userRepo.Locate(ctx, user)
-	if err != nil {
-		logger.Info(http.StatusInternalServerError)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	if finded {
-		logger.Info(http.StatusConflict)
-		w.WriteHeader(http.StatusConflict)
-		return
-	}
+		finded, err := ur.Locate(ctx, user)
+		if err != nil {
+			logger.Info(http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		if finded {
+			logger.Info(http.StatusConflict)
+			w.WriteHeader(http.StatusConflict)
+			return
+		}
 
-	if ok, err := userRepo.Add(ctx, user); !ok || err != nil {
-		logger.Info(http.StatusInternalServerError)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+		if ok, err := ur.Add(ctx, user); !ok || err != nil {
+			logger.Info(http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
 
-	w.Header().Add("Authorization", "Bearer "+user.Token)
-	w.WriteHeader(http.StatusCreated)
-	logger.Info(http.StatusCreated)
+		w.Header().Add("Authorization", "Bearer "+user.Token)
+		w.WriteHeader(http.StatusCreated)
+		logger.Info(http.StatusCreated)
+	}
 }
 
-func HandlerLogin(w http.ResponseWriter, r *http.Request) {
-	logger.Info("Обработка запроса входа")
-	ctx := r.Context()
+func HandlerLogin(ur models.UsersRepo) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		logger.Info("Обработка запроса входа")
+		ctx := r.Context()
 
-	user, ok := getUserFromRequest(r)
-	if !ok {
-		logger.Info(http.StatusBadRequest)
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		user, ok := getUserFromRequest(r)
+		if !ok {
+			logger.Info(http.StatusBadRequest)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		logPass := user.Password
+
+		finded, err := ur.Locate(ctx, user)
+		if err != nil {
+			logger.Info(http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		if !finded || user.Password != logPass {
+			logger.Info(http.StatusConflict)
+			w.WriteHeader(http.StatusConflict)
+			return
+		}
+
+		w.Header().Add("Authorization", "Bearer "+user.Token)
+		w.WriteHeader(http.StatusOK)
+		logger.Info(http.StatusOK)
 	}
-	logPass := user.Password
-
-	userRepo := database.NewDBUserRepo()
-
-	finded, err := userRepo.Locate(ctx, user)
-	if err != nil {
-		logger.Info(http.StatusInternalServerError)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	if !finded || user.Password != logPass {
-		logger.Info(http.StatusConflict)
-		w.WriteHeader(http.StatusConflict)
-		return
-	}
-
-	w.Header().Add("Authorization", "Bearer "+user.Token)
-	w.WriteHeader(http.StatusOK)
-	logger.Info(http.StatusOK)
 }
