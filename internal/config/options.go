@@ -66,7 +66,8 @@ func (c *Config) setDefault() {
 		c.servAddr = "localhost:8080"
 	}
 	if len(c.dbConnString) == 0 {
-		c.dbConnString = "user=kseikseich dbname=yad sslmode=disable"
+		// c.dbConnString = "user=kseikseich dbname=yad sslmode=disable"
+		c.dbConnString = "postgresql://postgres:postgres@postgres/praktikum?sslmode=disable"
 	}
 	if len(c.accuralAddress) == 0 {
 		c.accuralAddress = "http://localhost:8081"
