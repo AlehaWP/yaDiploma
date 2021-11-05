@@ -25,7 +25,7 @@ func (s *Server) Start(ctx context.Context) {
 	// handlers.NewHandlers(repo, opt)
 	// middlewares.NewCookie(repo)
 	r.Use(middlewares.ZipHandlerRead, middlewares.ZipHandlerWrite)
-	r.Get("/", handlers.HandlerStartPage)
+	r.Get("/*", handlers.HandlerStartPage)
 	r.Post("/api/user/register", handlers.HandlerRegistration(s.NewDBUserRepo()))
 	r.Post("/api/user/login", handlers.HandlerLogin(s.NewDBUserRepo()))
 	r.Route("/api", func(r chi.Router) {
