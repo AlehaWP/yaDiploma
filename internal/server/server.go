@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/AlehaWP/yaDiploma.git/internal/config"
 	"github.com/AlehaWP/yaDiploma.git/internal/handlers"
@@ -24,6 +25,7 @@ func (s *Server) Start(ctx context.Context) {
 	// handlers.NewHandlers(repo, opt)
 	// middlewares.NewCookie(repo)
 	r.Use(middlewares.ZipHandlerRead, middlewares.ZipHandlerWrite)
+	r.Get("/", handlers.HandlerStartPage)
 	r.Post("/api/user/register", handlers.HandlerRegistration(s.NewDBUserRepo()))
 	r.Post("/api/user/login", handlers.HandlerLogin(s.NewDBUserRepo()))
 	r.Route("/api", func(r chi.Router) {
@@ -48,10 +50,10 @@ func (s *Server) Start(ctx context.Context) {
 	s.Addr = config.Cfg.ServAddr()
 	logger.Info("Старт сервера по адресу", config.Cfg.ServAddr())
 	s.Handler = r
-	s.ListenAndServe()
+	go s.ListenAndServe()
 
-	//<-ctx.Done()
-	//ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*5)
-	//defer cancelFunc()
-	// s.Shutdown(ctx)
+	<-ctx.Done()
+	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancelFunc()
+	s.Shutdown(ctx)
 }

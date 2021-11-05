@@ -9,6 +9,7 @@ import (
 	"github.com/AlehaWP/yaDiploma.git/internal/database"
 	"github.com/AlehaWP/yaDiploma.git/internal/server"
 	"github.com/AlehaWP/yaDiploma.git/pkg/logger"
+	"github.com/AlehaWP/yaDiploma.git/pkg/ossignal"
 	"github.com/pressly/goose/v3"
 )
 
@@ -50,13 +51,11 @@ func main() {
 	sDB := database.OpenDBConnect()
 	defer sDB.Close()
 
-	//go ossignal.HandleQuit(cancel)
+	go ossignal.HandleQuit(cancel)
 
 	s := new(server.Server)
 	s.ServerDB = sDB
 	s.Start(ctx)
-
-	//<-ctx.Done()
 	logger.Info("Сервер остановлен")
 
 }
