@@ -33,7 +33,6 @@ func (s *serverDB) makeMigrations() {
 	logger.NewLogs()
 	p := "Миграции базы данных:"
 	logger.Info(p, "Старт")
-	logger.Info(p, "Подключение к БД")
 	// setup database
 	logger.Info(p, "Применение миграций")
 	if err := goose.Up(s.DB, "../../db/migrations"); err != nil {
@@ -53,7 +52,7 @@ func OpenDBConnect() models.ServerDB {
 	s.CheckDBConnection(ctx)
 
 	// так и не заработали. На локальной машине работали
-	// s.makeMigrations()
+	s.makeMigrations()
 	return s
 }
 
