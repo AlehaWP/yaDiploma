@@ -2,7 +2,6 @@ package config
 
 import (
 	"flag"
-	"fmt"
 	"os"
 	"sync"
 
@@ -89,7 +88,6 @@ func createConfig() {
 	Cfg.setDefault()
 	Cfg.checkEnv()
 	Cfg.setFlags()
-	fmt.Println(Cfg.DBConnString())
 	Cfg.appDir = appDir
 	logger.Info("Создан config")
 }

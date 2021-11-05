@@ -24,3 +24,5 @@ ERROR	2021/11/06 02:40:21 Ошибка подключения к БДdial tcp: l
 ERROR	2021/11/06 02:45:05 Ошибка подключения к БДdial tcp: lookup postgres: no such host
 ERROR	2021/11/06 02:45:41 Ошибка подключения к БДdial tcp: lookup postgres: no such host
 ERROR	2021/11/06 02:46:29 Ошибка подключения к БДdial tcp: lookup postgres: no such host
+ERROR	2021/11/06 02:56:01 Миграции базы данных:/home/kseikseich/Go/github.com/AlehaWP/yaDiploma.git/cmd/gophermart../../db/migrations directory does not exist
+ERROR	2021/11/06 02:58:40 Миграции базы данных:/home/kseikseich/Go/github.com/AlehaWP/yaDiploma.git/cmd/gophermart../../db/migrations directory does not exist
