@@ -5,19 +5,19 @@ import "context"
 type Status string
 
 const (
-	Processed  Status = "PROCESSED"
-	Processing Status = "PROCESSING"
-	Invalid    Status = "INVALID"
-	New        Status = "NEW"
+	OrderStatusProcessed  Status = "PROCESSED"
+	OrderStatusProcessing Status = "PROCESSING"
+	OrderStatusInvalid    Status = "INVALID"
+	OrderStatusNew        Status = "NEW"
 )
 
 type Order struct {
-	ID      int
-	OrderID string
-	Status  Status
-	Accural float32
-	DateAdd string
-	UserID  int
+	ID      int     `json:"-"`
+	OrderID string  `json:"number"`
+	Status  Status  `json:"status"`
+	Accural float32 `json:"accrual"`
+	DateAdd string  `json:"uploaded_at"`
+	UserID  int     `json:"-"`
 }
 
 type OrdersRepo interface {

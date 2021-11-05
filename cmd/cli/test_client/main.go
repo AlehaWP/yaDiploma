@@ -41,9 +41,9 @@ func testSign(t string, log string, pas string) {
 	}
 	a := "http://localhost:8080/api/user/" + t
 	fmt.Println("\n", "Без сжатия:")
-	makePostRequest(a, "aplication/json", "", reqBody)
+	makePostRequest(a, "aplication/json", "", "POST", reqBody)
 	fmt.Println("\n", "Со сжатием:")
-	makeZipPostRequest(a, "aplication/json", "", reqBody)
+	makeZipPostRequest(a, "aplication/json", "", "POST", reqBody)
 	fmt.Println("Окончание теста")
 	fmt.Println("--------------------------------------------------------------------------------------------------------")
 }
@@ -57,18 +57,33 @@ func testNewOrder(num, key string) {
 	a := "http://localhost:8080/api/user/orders"
 	fmt.Println("Данные:", num, "Ключ:", key)
 	fmt.Println("\n", "Без сжатия:")
-	makePostRequest(a, "aplication/json", key, reqBody)
+	makePostRequest(a, "text/plain", key, "POST", reqBody)
 	fmt.Println("\n", "Со сжатием:")
-	makeZipPostRequest(a, "aplication/json", key, reqBody)
+	makeZipPostRequest(a, "text/plain", key, "POST", reqBody)
 	fmt.Println("Окончание теста")
 	fmt.Println("--------------------------------------------------------------------------------------------------------")
 }
 
-func makePostRequest(a, t, k string, b []byte) {
+func testUserOrders(key string) {
+	fmt.Println("Тест:", "UserOrders")
+	fmt.Println("Адрес", "http://localhost:8080/api/user/orders")
+
+	reqBody := []byte("")
+	a := "http://localhost:8080/api/user/orders"
+	fmt.Println("Данные:", "", "Ключ:", key)
+	fmt.Println("\n", "Без сжатия:")
+	makePostRequest(a, "text/plain", key, "GET", reqBody)
+	fmt.Println("\n", "Со сжатием:")
+	makeZipPostRequest(a, "text/plain", key, "GET", reqBody)
+	fmt.Println("Окончание теста")
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+}
+
+func makePostRequest(address, ctype, key, rtype string, b []byte) {
 	client := &http.Client{}
-	req, _ := http.NewRequest("POST", a, bytes.NewReader(b))
-	req.Header.Add("Content-Type", t)
-	req.Header.Add("Authorization", k)
+	req, _ := http.NewRequest(rtype, address, bytes.NewReader(b))
+	req.Header.Add("Content-Type", ctype)
+	req.Header.Add("Authorization", key)
 	// r, err := http.Post(a, t, bytes.NewBuffer(b)) //bytes.NewBuffer(reqBody))
 	r, err := client.Do(req)
 	if err != nil {
@@ -80,7 +95,7 @@ func makePostRequest(a, t, k string, b []byte) {
 	printResult(r.Body, r)
 }
 
-func makeZipPostRequest(a, t, k string, reqBody []byte) {
+func makeZipPostRequest(address, ctype, key, rtype string, reqBody []byte) {
 	var b bytes.Buffer
 	gz := gzip.NewWriter(&b)
 
@@ -89,11 +104,11 @@ func makeZipPostRequest(a, t, k string, reqBody []byte) {
 	gz.Close()
 
 	client := &http.Client{}
-	req, _ := http.NewRequest("POST", a, bytes.NewReader(b.Bytes()))
+	req, _ := http.NewRequest(rtype, address, bytes.NewReader(b.Bytes()))
 	req.Header.Add("Content-Encoding", "gzip")
 	req.Header.Add("Accept-Encoding", "gzip")
-	req.Header.Add("Content-Type", t)
-	req.Header.Add("Authorization", k)
+	req.Header.Add("Content-Type", ctype)
+	req.Header.Add("Authorization", key)
 
 	r, err := client.Do(req)
 	if err != nil {
@@ -162,12 +177,60 @@ func makeGetPing() {
 }
 
 func main() {
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+	fmt.Println("Ожидаемый результат 200(на новой базе) 409(на старой), 409", "успешно, уже есть")
 	testSign("register", "Aleha", "123123213")
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+	fmt.Println("Ожидаемый результат 200(на новой базе) 409(на старой), 409", "успешно, уже есть")
 	testSign("register", "Kartoha", "457457457457")
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+	fmt.Println("Ожидаемый результат 200, 200", "Успешно")
 	testSign("login", "Aleha", "123123213")
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+	fmt.Println("Ожидаемый результат 200, 200", "Успешно")
 	testSign("login", "Kartoha", "457457457457")
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+	fmt.Println("Ожидаемый результат 401, 401", "Неверная пара логи, пароль")
+	testSign("login", "Karas", "457457457457")
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+	fmt.Println("Ожидаемый результат 422, 422", "Не верный формат заказа")
 	testNewOrder("4561261212345464", "Bearer 4f21d29e30e4276259d3876e112ad37c")
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+	fmt.Println("Ожидаемый результат 202, 200", "Создан, уже есть")
 	testNewOrder("4561261212345467", "Bearer 4f21d29e30e4276259d3876e112ad37c")
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+	fmt.Println("Ожидаемый результат 409, 409", "Загружено другим пользователем")
+	testNewOrder("4561261212345467", "Bearer 6b98c42394f9ce2763e152c0b52548db")
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+	fmt.Println("Ожидаемый результат 202, 200", "Создан, уже есть")
+	testNewOrder("3561261212345469", "Bearer 6b98c42394f9ce2763e152c0b52548db")
+
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+	fmt.Println("Ожидаемый результат 401, 401", "Пользователь не авторизован")
+	testUserOrders("Bearer 6b98c42394f9ce2763e152c0b5223")
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+	fmt.Println("Ожидаемый результат 200, 200", "Заказы пользователя")
+	testUserOrders("Bearer 6b98c42394f9ce2763e152c0b52548db")
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+
 	// makeGetPing()
 
 	// makePost()

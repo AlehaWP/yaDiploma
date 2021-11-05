@@ -39,13 +39,14 @@ func (db DBUserRepo) Add(ctx context.Context, u *models.User) error {
 
 	u.Token = encription.EncriptStr(u.Login)
 
-	q := `INSERT INTO users (user_name, user_password, user_token) VALUES ($1,$2,$3)`
-	_, err := db.ExecContext(ctx, q, u.Login, u.Password, u.Token)
+	q := `INSERT INTO users (user_name, user_password, user_token) VALUES ($1,$2,$3) RETURNING ID`
+	row := db.QueryRowContext(ctx, q, u.Login, u.Password, u.Token)
 
-	if err != nil {
+	if err := row.Scan(&u.ID); err != nil {
 		logger.Info(q, err)
 		return err
 	}
+
 	return nil
 }
 

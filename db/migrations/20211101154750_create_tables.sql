@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS orders (
 		id SERIAL PRIMARY KEY,
 		user_id VARCHAR(36),
 		order_id VARCHAR(50) UNIQUE,
-        accrual NUMERIC,
+        accrual NUMERIC default 0,
         order_status VARCHAR(20),
 		date_add TIMESTAMPTZ default (NOW() at time zone 'UTC+3'));
 

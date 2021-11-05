@@ -83,8 +83,8 @@ func HandlerLogin(ur models.UsersRepo) http.HandlerFunc {
 		}
 
 		if !finded || user.Password != logPass {
-			logger.Info(http.StatusConflict)
-			w.WriteHeader(http.StatusConflict)
+			logger.Info(http.StatusUnauthorized)
+			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 

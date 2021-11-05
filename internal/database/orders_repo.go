@@ -14,6 +14,7 @@ type DBOrdersRepo struct {
 }
 
 func (db *DBOrdersRepo) Get(ctx context.Context, o *models.Order) (bool, error) {
+	logger.Info("Проверка наличия заказа")
 	ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
 	defer cancelfunc()
 	q := `SELECT id, user_id FROM orders WHERE order_id=$1`
@@ -30,15 +31,41 @@ func (db *DBOrdersRepo) Get(ctx context.Context, o *models.Order) (bool, error) 
 }
 
 func (db *DBOrdersRepo) GetAll(ctx context.Context, userID int) ([]models.Order, error) {
-	return nil, nil
+	logger.Info("Запрос заказов пользователя")
+	ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
+	defer cancelfunc()
+	q := `SELECT id, order_id, accrual, order_status, date_add FROM orders WHERE user_id=$1`
+	rows, err := db.QueryContext(ctx, q, userID)
+	defer rows.Close()
+
+	if err != nil {
+		logger.Info(err)
+		return nil, err
+	}
+	var aOrders []models.Order
+	for rows.Next() {
+		var o models.Order
+		if err := rows.Scan(&o.ID, &o.OrderID, &o.Accural, &o.Status, &o.DateAdd); err != nil {
+			logger.Info(err)
+			return nil, err
+		}
+		aOrders = append(aOrders, o)
+	}
+	err = rows.Err()
+	if err != nil {
+		logger.Info(err)
+		return nil, err
+	}
+
+	return aOrders, nil
 }
 
 func (db *DBOrdersRepo) Add(ctx context.Context, o *models.Order) error {
 	ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
 	defer cancelfunc()
 
-	q := `INSERT INTO orders (order_id, user_id, order_status) VALUES ($1,$2,'NEW') RETURNING ID`
-	row := db.QueryRowContext(ctx, q, o.OrderID, o.UserID)
+	q := `INSERT INTO orders (order_id, user_id, order_status) VALUES ($1,$2, $3) RETURNING ID`
+	row := db.QueryRowContext(ctx, q, o.OrderID, o.UserID, models.OrderStatusNew)
 
 	if err := row.Scan(&o.ID); err != nil {
 		logger.Info(q, err)

@@ -29,5 +29,6 @@ func main() {
 	s.Start(ctx)
 
 	<-ctx.Done()
+	logger.Info("Сервер остановлен")
 
 }
