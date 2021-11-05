@@ -59,10 +59,7 @@ func (db DBUserRepo) update(ctx context.Context, u *models.User) bool {
 	q := `UPDATE users SET user_name=$2, user_password=$3, user_token=$4 WHERE ID=$4`
 	_, err := db.ExecContext(ctx, q, u.ID, u.Login, u.Password, u.Token)
 
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }
 
 func (db DBUserRepo) Del(ctx context.Context, u *models.User) error {

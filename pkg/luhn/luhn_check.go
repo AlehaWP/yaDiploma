@@ -39,10 +39,5 @@ func Check(arr []int) bool {
 		cd += v
 	}
 
-	if (cd+controlSum)%10 != 0 {
-		return false
-	}
-
-	return true
-
+	return (cd+controlSum)%10 == 0
 }

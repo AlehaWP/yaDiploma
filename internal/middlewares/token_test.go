@@ -76,7 +76,7 @@ func TestCheckAuthorization(t *testing.T) {
 		uRM.On("Get", r.Context(), ur).Return(true, nil)
 		handler.ServeHTTP(w, r)
 		res := w.Result()
-
+		defer res.Body.Close()
 		assert.Equal(t, v.resStatus, res.StatusCode, "Не верный код ответа GET")
 	}
 

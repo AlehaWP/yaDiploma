@@ -7,7 +7,7 @@ import (
 	"github.com/AlehaWP/yaDiploma.git/internal/database"
 	"github.com/AlehaWP/yaDiploma.git/internal/server"
 	"github.com/AlehaWP/yaDiploma.git/pkg/logger"
-	"github.com/AlehaWP/yaDiploma.git/pkg/os_signal"
+	"github.com/AlehaWP/yaDiploma.git/pkg/ossignal"
 )
 
 func main() {
@@ -22,7 +22,7 @@ func main() {
 	sDB := database.OpenDBConnect()
 	defer sDB.Close()
 
-	go os_signal.HandleQuit(cancel)
+	go ossignal.HandleQuit(cancel)
 
 	s := new(server.Server)
 	s.ServerDB = sDB

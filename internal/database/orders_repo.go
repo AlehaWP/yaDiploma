@@ -36,12 +36,12 @@ func (db *DBOrdersRepo) GetAll(ctx context.Context, userID int) ([]models.Order,
 	defer cancelfunc()
 	q := `SELECT id, order_id, accrual, order_status, date_add FROM orders WHERE user_id=$1`
 	rows, err := db.QueryContext(ctx, q, userID)
-	defer rows.Close()
-
 	if err != nil {
 		logger.Info(err)
 		return nil, err
 	}
+	defer rows.Close()
+
 	var aOrders []models.Order
 	for rows.Next() {
 		var o models.Order
