@@ -35,7 +35,7 @@ func HelloWorld(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	makeMigrations()
+	//makeMigrations()
 	logger.NewLogs()
 	defer logger.Close()
 	logger.Info("Старт сервера")
