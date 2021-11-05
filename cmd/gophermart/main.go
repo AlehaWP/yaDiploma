@@ -34,7 +34,7 @@ func makeMigrations() {
 }
 
 func main() {
-	makeMigrations()
+	//makeMigrations()
 	logger.NewLogs()
 	defer logger.Close()
 	logger.Info("Старт сервера")
