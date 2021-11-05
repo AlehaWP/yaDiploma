@@ -58,7 +58,7 @@ func main() {
 	http.HandleFunc("/api/user/register", HelloWorld)
 	http.HandleFunc("/api/user/login", HelloWorld)
 	// запуск сервера с адресом localhost, порт 8080
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":8085", nil)
 	logger.Info("Сервер остановлен")
 
 }
