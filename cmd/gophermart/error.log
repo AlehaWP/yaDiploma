@@ -8,3 +8,4 @@ ERROR	2021/11/05 21:22:44 Миграции базы данных:../../../db/mig
 ERROR	2021/11/05 21:39:27 Миграции базы данных:pq: база данных "yav" не существует
 ERROR	2021/11/05 22:21:29 Ошибка подключения к БДdial tcp [::1]:5432: connect: connection refused
 ERROR	2021/11/05 22:59:10 Миграции базы данных:sql: unknown driver "postgres" (forgotten import?)
+ERROR	2021/11/05 23:16:29 Ошибка подключения к БДdial tcp: lookup postgres: no such host

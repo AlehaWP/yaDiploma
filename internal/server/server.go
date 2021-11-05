@@ -47,8 +47,7 @@ func (s *Server) Start(ctx context.Context) {
 	// r.Post("/api/shorten/batch", handlers.HandlerAPIURLsPost)
 	// r.Delete("/api/user/urls", handlers.HandlerDeleteUserUrls)
 
-	// s.Addr = config.Cfg.ServAddr()
-	s.Addr = ":8085"
+	s.Addr = config.Cfg.ServAddr()
 	logger.Info("Старт сервера по адресу", config.Cfg.ServAddr())
 	s.Handler = r
 	go s.ListenAndServe()
