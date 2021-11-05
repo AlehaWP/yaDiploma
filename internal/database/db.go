@@ -51,6 +51,8 @@ func OpenDBConnect() models.ServerDB {
 	}
 	s.DB = db
 	s.CheckDBConnection(ctx)
+
+	// так и не заработали. На локальной машине работали
 	// s.makeMigrations()
 	return s
 }
