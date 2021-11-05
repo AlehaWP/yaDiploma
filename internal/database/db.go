@@ -51,7 +51,7 @@ func OpenDBConnect() models.ServerDB {
 	}
 	s.DB = db
 	s.CheckDBConnection(ctx)
-	s.makeMigrations()
+	// s.makeMigrations()
 	return s
 }
 
