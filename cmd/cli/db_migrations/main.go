@@ -17,10 +17,11 @@ func main() {
 	config.NewConfig()
 	logger.Info(p, "Подключение к БД")
 	db, err := sql.Open("postgres", config.Cfg.DBConnString())
-	defer db.Close()
 	if err != nil {
 		logger.Error(p, err)
 	}
+
+	defer db.Close()
 	// setup database
 	logger.Info(p, "Применение миграций")
 	if err := goose.Up(db, "../../../db/migrations"); err != nil {

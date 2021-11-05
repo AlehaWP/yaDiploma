@@ -55,13 +55,29 @@ func (c *Config) checkEnv() {
 	if len(e.DBConnString) != 0 {
 		c.dbConnString = e.DBConnString
 	}
+	if len(e.AccuralAddress) != 0 {
+		c.accuralAddress = e.AccuralAddress
+	}
+}
+
+func (c *Config) setDefault() {
+
+	if len(c.servAddr) == 0 {
+		c.servAddr = "localhost:8080"
+	}
+	if len(c.dbConnString) == 0 {
+		c.dbConnString = "user=kseikseich dbname=yad sslmode=disable"
+	}
+	if len(c.accuralAddress) == 0 {
+		c.accuralAddress = "http://localhost:8081"
+	}
 }
 
 //setFlags for get options from console to default application options.
 func (c *Config) setFlags() {
-	flag.StringVar(&c.servAddr, "a", "localhost:8080", "a server address string")
-	flag.StringVar(&c.dbConnString, "d", "user=kseikseich dbname=yad sslmode=disable", "a db connection string")
-	flag.StringVar(&c.accuralAddress, "r", "http://localhost:8081", "a accural system address")
+	flag.StringVar(&c.servAddr, "a", "", "a server address string")
+	flag.StringVar(&c.dbConnString, "d", "", "a db connection string")
+	flag.StringVar(&c.accuralAddress, "r", "", "a accural system address")
 	flag.Parse()
 }
 
@@ -72,8 +88,9 @@ func createConfig() {
 	if err != nil {
 		logger.Error(err)
 	}
-	Cfg.setFlags()
 	Cfg.checkEnv()
+	Cfg.setFlags()
+	Cfg.setDefault()
 	Cfg.appDir = appDir
 	logger.Info("Создан config")
 }
