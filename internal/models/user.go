@@ -4,7 +4,7 @@ import "context"
 
 type UserKeyName string
 
-const UKeyName UserKeyName = "UserUID"
+const UKeyName UserKeyName = "UserID"
 
 type User struct {
 	Login    string `json:"login"`
@@ -14,7 +14,7 @@ type User struct {
 }
 
 type UsersRepo interface {
-	Locate(context.Context, *User) (bool, error)
+	Get(context.Context, *User) (bool, error)
 	Add(context.Context, *User) (bool, error)
 	Del(context.Context, *User) (bool, error)
 }

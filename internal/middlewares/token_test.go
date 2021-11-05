@@ -1,38 +1,35 @@
 package middlewares
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
+	"github.com/AlehaWP/yaDiploma.git/internal/models"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
-// func TestCheckAuthorization(t *testing.T) {
-// 	type args struct {
-// 		next http.Handler
-// 	}
-//     handler :=
-// 	r := httptest.NewRequest("GET", "/", strings.NewReader(""))
-// 	r.Header.Add("Authorization", "")
-// 	w := httptest.NewRecorder()
+type UsersRepoMock struct {
+	mock.Mock
+}
 
-// 	tests := []struct {
-// 		name string
-// 		args args
-// 		want http.Handler
-// 	}{
-// 		// TODO: Add test cases.
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			if got := (tt.args.next); !reflect.DeepEqual(got, tt.want) {
-// 				t.Errorf("CheckAuthorization() = %v, want %v", got, tt.want)
-// 			}
-// 		})
-// 	}
-// }
+func (m *UsersRepoMock) Get(ctx context.Context, u *models.User) (bool, error) {
+	args := m.Called(ctx, u)
+	return args.Bool(0), args.Error(1)
+}
+
+func (m *UsersRepoMock) Add(ctx context.Context, u *models.User) (bool, error) {
+	args := m.Called(ctx, u)
+	return args.Bool(0), args.Error(1)
+}
+
+func (m *UsersRepoMock) Del(ctx context.Context, u *models.User) (bool, error) {
+	args := m.Called(ctx, u)
+	return args.Bool(0), args.Error(1)
+}
 
 type testHandler struct{}
 
@@ -41,6 +38,7 @@ func (t *testHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func TestCheckAuthorization(t *testing.T) {
+	uRM := new(UsersRepoMock)
 
 	testValue := map[string]struct {
 		token     string
@@ -62,13 +60,20 @@ func TestCheckAuthorization(t *testing.T) {
 
 	r := httptest.NewRequest("GET", "/", strings.NewReader(""))
 
+	ur := new(models.User)
+
 	tHandler := new(testHandler)
-	handler := CheckAuthorization(tHandler)
+	funcHandler := CheckAuthorization(uRM)
+	handler := funcHandler(tHandler)
 	var w *httptest.ResponseRecorder
 
 	for _, v := range testValue {
 		w = httptest.NewRecorder()
 		r.Header.Set("Authorization", v.token)
+		if len(v.token) > 7 {
+			ur.Token = v.token[7:]
+		}
+		uRM.On("Get", r.Context(), ur).Return(true, nil)
 		handler.ServeHTTP(w, r)
 		res := w.Result()
 

@@ -38,7 +38,7 @@ func HandlerRegistration(ur models.UsersRepo) http.HandlerFunc {
 			return
 		}
 
-		finded, err := ur.Locate(ctx, user)
+		finded, err := ur.Get(ctx, user)
 		if err != nil {
 			logger.Info(http.StatusInternalServerError)
 			w.WriteHeader(http.StatusInternalServerError)
@@ -75,7 +75,7 @@ func HandlerLogin(ur models.UsersRepo) http.HandlerFunc {
 		}
 		logPass := user.Password
 
-		finded, err := ur.Locate(ctx, user)
+		finded, err := ur.Get(ctx, user)
 		if err != nil {
 			logger.Info(http.StatusInternalServerError)
 			w.WriteHeader(http.StatusInternalServerError)

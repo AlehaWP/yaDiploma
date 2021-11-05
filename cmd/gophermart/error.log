@@ -2,3 +2,4 @@ ERROR	2021/11/04 01:28:13 Ошибка подключения к БДsql: unknow
 ERROR	2021/11/04 01:29:10 Ошибка подключения к БДdial tcp [::1]:5432: connect: connection refused
 ERROR	2021/11/04 14:21:29 Ошибка подключения к БДdial tcp [::1]:5432: connect: connection refused
 ERROR	2021/11/04 21:11:41 Ошибка подключения к БДdial tcp [::1]:5432: connect: connection refused
+ERROR	2021/11/05 03:03:43 Ошибка подключения к БДdial tcp [::1]:5432: connect: connection refused

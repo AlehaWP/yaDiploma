@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/AlehaWP/yaDiploma.git/internal/models"
@@ -13,14 +14,13 @@ type DBUserRepo struct {
 	serverDB
 }
 
-func (db DBUserRepo) Locate(ctx context.Context, u *models.User) (bool, error) {
+func (db DBUserRepo) Get(ctx context.Context, u *models.User) (bool, error) {
 	ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
 	defer cancelfunc()
-	q := `SELECT id, user_name, user_token, user_password FROM users WHERE user_token=$1 OR user_name=$2`
+	q := `SELECT COALESCE(id, 0), user_name, user_token, user_password FROM users WHERE user_token=$1 OR user_name=$2`
 	row := db.QueryRowContext(ctx, q, u.Token, u.Login)
-
-	if err := row.Scan(&u.UserID, &u.Login, &u.Token, &u.Password); err != nil {
-		logger.Info(err)
+	if err := row.Scan(&u.UserID, &u.Login, &u.Token, &u.Password); err != nil && err != sql.ErrNoRows {
+		logger.Info(q, err)
 		return false, err
 	}
 	if u.UserID == 0 {
@@ -43,6 +43,7 @@ func (db DBUserRepo) Add(ctx context.Context, u *models.User) (bool, error) {
 	_, err := db.ExecContext(ctx, q, u.Login, u.Password, u.Token)
 
 	if err != nil {
+		logger.Info(q, err)
 		return false, err
 	}
 	return true, nil

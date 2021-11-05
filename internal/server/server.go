@@ -27,7 +27,7 @@ func (s *Server) Start(ctx context.Context) {
 	r.Use(middlewares.ZipHandlerRead, middlewares.ZipHandlerWrite)
 	r.Post("/api/user/register", handlers.HandlerRegistration(s.NewDBUserRepo()))
 	r.Post("/api/user/login", handlers.HandlerLogin(s.NewDBUserRepo()))
-	// r.Use(middlewares.CheckAuthorization)
+	// r.Use(middlewares.CheckAuthorization(s.NewDBUserRepo()))
 	// //r.Use(middlewares.ZipHandlerRead, middlewares.ZipHandlerWrite)
 
 	// r.Get("/user/urls", handlers.HandlerUserPostURLs)
