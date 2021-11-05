@@ -3,12 +3,12 @@ package main
 import (
 	"context"
 	"database/sql"
+	"net/http"
 
 	"github.com/AlehaWP/yaDiploma.git/internal/config"
 	"github.com/AlehaWP/yaDiploma.git/internal/database"
 	"github.com/AlehaWP/yaDiploma.git/internal/server"
 	"github.com/AlehaWP/yaDiploma.git/pkg/logger"
-	"github.com/AlehaWP/yaDiploma.git/pkg/ossignal"
 	"github.com/pressly/goose/v3"
 )
 
@@ -33,8 +33,12 @@ func makeMigrations() {
 	logger.Info(p, "Завершение") // run app
 }
 
+func HelloWorld(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("<h1>Hello, World</h1>"))
+}
+
 func main() {
-	//makeMigrations()
+	makeMigrations()
 	logger.NewLogs()
 	defer logger.Close()
 	logger.Info("Старт сервера")
@@ -46,13 +50,13 @@ func main() {
 	sDB := database.OpenDBConnect()
 	defer sDB.Close()
 
-	go ossignal.HandleQuit(cancel)
+	//go ossignal.HandleQuit(cancel)
 
 	s := new(server.Server)
 	s.ServerDB = sDB
 	s.Start(ctx)
 
-	<-ctx.Done()
+	//<-ctx.Done()
 	logger.Info("Сервер остановлен")
 
 }

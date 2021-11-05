@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"net/http"
-	"time"
 
 	"github.com/AlehaWP/yaDiploma.git/internal/config"
 	"github.com/AlehaWP/yaDiploma.git/internal/handlers"
@@ -49,10 +48,10 @@ func (s *Server) Start(ctx context.Context) {
 	s.Addr = config.Cfg.ServAddr()
 	logger.Info("Старт сервера по адресу", config.Cfg.ServAddr())
 	s.Handler = r
-	go s.ListenAndServe()
+	s.ListenAndServe()
 
-	<-ctx.Done()
-	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*5)
-	defer cancelFunc()
-	s.Shutdown(ctx)
+	//<-ctx.Done()
+	//ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*5)
+	//defer cancelFunc()
+	// s.Shutdown(ctx)
 }

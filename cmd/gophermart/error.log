@@ -6,3 +6,4 @@ ERROR	2021/11/05 03:03:43 Ошибка подключения к БДdial tcp [:
 ERROR	2021/11/05 14:40:52 Ошибка подключения к БДdial tcp [::1]:5432: connect: connection refused
 ERROR	2021/11/05 21:22:44 Миграции базы данных:../../../db/migrations directory does not exist
 ERROR	2021/11/05 21:39:27 Миграции базы данных:pq: база данных "yav" не существует
+ERROR	2021/11/05 22:21:29 Ошибка подключения к БДdial tcp [::1]:5432: connect: connection refused
