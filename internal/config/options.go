@@ -2,6 +2,7 @@ package config
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"sync"
 
@@ -44,7 +45,8 @@ type EnvOptions struct {
 //checkEnv for get options from env to default application options.
 func (c *Config) checkEnv() {
 
-	e := &EnvOptions{}
+	e := new(EnvOptions)
+	e.DBConnString = "ads"
 	err := env.Parse(e)
 	if err != nil {
 		logger.Info("Ошибка чтения конфигурации из переменного окружения", err)
@@ -58,27 +60,21 @@ func (c *Config) checkEnv() {
 	if len(e.AccuralAddress) != 0 {
 		c.accuralAddress = e.AccuralAddress
 	}
+
 }
 
 func (c *Config) setDefault() {
-
-	if len(c.servAddr) == 0 {
-		c.servAddr = "localhost:8080"
-	}
-	if len(c.dbConnString) == 0 {
-		// c.dbConnString = "user=kseikseich dbname=yad sslmode=disable"
-		c.dbConnString = "postgresql://postgres:postgres@postgres/praktikum?sslmode=disable"
-	}
-	if len(c.accuralAddress) == 0 {
-		c.accuralAddress = "http://localhost:8081"
-	}
+	c.servAddr = "localhost:8080"
+	c.dbConnString = "user=kseikseich dbname=yad sslmode=disable"
+	//c.dbConnString = "postgresql://postgres:postgres@postgres/praktikum?sslmode=disable"
+	c.accuralAddress = "http://localhost:8081"
 }
 
 //setFlags for get options from console to default application options.
 func (c *Config) setFlags() {
-	flag.StringVar(&c.servAddr, "a", "", "a server address string")
-	flag.StringVar(&c.dbConnString, "d", "", "a db connection string")
-	flag.StringVar(&c.accuralAddress, "r", "", "a accural system address")
+	flag.StringVar(&c.servAddr, "a", c.servAddr, "a server address string")
+	flag.StringVar(&c.dbConnString, "d", c.dbConnString, "a db connection string")
+	flag.StringVar(&c.accuralAddress, "r", c.accuralAddress, "a accural system address")
 	flag.Parse()
 }
 
@@ -89,9 +85,11 @@ func createConfig() {
 	if err != nil {
 		logger.Error(err)
 	}
+
+	Cfg.setDefault()
 	Cfg.checkEnv()
 	Cfg.setFlags()
-	Cfg.setDefault()
+	fmt.Println(Cfg.DBConnString())
 	Cfg.appDir = appDir
 	logger.Info("Создан config")
 }
