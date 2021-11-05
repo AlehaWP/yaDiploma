@@ -1,15 +1,14 @@
 package main
 
 import (
-	"context"
 	"database/sql"
 	"net/http"
 
 	"github.com/AlehaWP/yaDiploma.git/internal/config"
 	"github.com/AlehaWP/yaDiploma.git/internal/database"
+	"github.com/AlehaWP/yaDiploma.git/internal/handlers"
 	"github.com/AlehaWP/yaDiploma.git/internal/server"
 	"github.com/AlehaWP/yaDiploma.git/pkg/logger"
-	"github.com/AlehaWP/yaDiploma.git/pkg/ossignal"
 	"github.com/pressly/goose/v3"
 )
 
@@ -44,18 +43,25 @@ func main() {
 	defer logger.Close()
 	logger.Info("Старт сервера")
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	// ctx, cancel := context.WithCancel(context.Background())
+	// defer cancel()
 	config.NewConfig()
 
 	sDB := database.OpenDBConnect()
 	defer sDB.Close()
 
-	go ossignal.HandleQuit(cancel)
+	// go ossignal.HandleQuit(cancel)
 
 	s := new(server.Server)
 	s.ServerDB = sDB
-	s.Start(ctx)
+	// s.Start(ctx)
+
+	http.HandleFunc("/", HelloWorld)
+
+	http.HandleFunc("/api/user/register", handlers.HandlerRegistration(s.NewDBUserRepo()))
+	http.HandleFunc("/api/user/login", handlers.HandlerLogin(s.NewDBUserRepo()))
+	// запуск сервера с адресом localhost, порт 8080
+	http.ListenAndServe(":8080", nil)
 	logger.Info("Сервер остановлен")
 
 }
