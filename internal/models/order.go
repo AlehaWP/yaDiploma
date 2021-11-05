@@ -12,7 +12,8 @@ const (
 )
 
 type Order struct {
-	Id      string
+	ID      int
+	OrderID string
 	Status  Status
 	Accural float32
 	DateAdd string
@@ -22,5 +23,5 @@ type Order struct {
 type OrdersRepo interface {
 	Get(context.Context, *Order) (bool, error)
 	GetAll(context.Context, int) ([]Order, error)
-	Add(context.Context, *Order) (bool, error)
+	Add(context.Context, *Order) error
 }

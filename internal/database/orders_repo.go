@@ -2,44 +2,52 @@ package database
 
 import (
 	"context"
+	"database/sql"
+	"time"
 
 	"github.com/AlehaWP/yaDiploma.git/internal/models"
+	"github.com/AlehaWP/yaDiploma.git/pkg/logger"
 )
 
 type DBOrdersRepo struct {
 	serverDB
 }
 
-func (db *DBOrdersRepo) Get(ctx context.Context, r *models.Order) (bool, error) {
-	// ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
-	// defer cancelfunc()
-	// q := `SELECT id, user_name, user_token, user_password FROM users WHERE user_token=$1 OR user_name=$2`
-	// row := db.QueryRowContext(ctx, q, u.Token, u.Login)
+func (db *DBOrdersRepo) Get(ctx context.Context, o *models.Order) (bool, error) {
+	ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
+	defer cancelfunc()
+	q := `SELECT id, user_id FROM orders WHERE order_id=$1`
+	row := db.QueryRowContext(ctx, q, o.OrderID)
 
-	// if err := row.Scan(&u.UserID, &u.Login, &u.Token, &u.Password); err != nil {
-	// 	logger.Info(err)
-	// 	return false, err
-	// }
-	// if u.UserID == 0 {
-	// 	return false, nil
-	// }
-	// if len(u.Token) == 0 {
-	// 	u.Token = encription.EncriptStr(u.Login)
-	// 	db.update(ctx, u)
-	// }
+	if err := row.Scan(&o.ID, &o.UserID); err != nil && err != sql.ErrNoRows {
+		logger.Info(err)
+		return false, err
+	}
+	if o.ID == 0 {
+		return false, nil
+	}
 	return true, nil
-
 }
 
 func (db *DBOrdersRepo) GetAll(ctx context.Context, userID int) ([]models.Order, error) {
 	return nil, nil
 }
 
-func (db *DBOrdersRepo) Add(ctx context.Context, r *models.Order) (bool, error) {
-	return false, nil
+func (db *DBOrdersRepo) Add(ctx context.Context, o *models.Order) error {
+	ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
+	defer cancelfunc()
+
+	q := `INSERT INTO orders (order_id, user_id, order_status) VALUES ($1,$2,'NEW') RETURNING ID`
+	row := db.QueryRowContext(ctx, q, o.OrderID, o.UserID)
+
+	if err := row.Scan(&o.ID); err != nil {
+		logger.Info(q, err)
+		return err
+	}
+	return nil
 }
 
-func (s serverDB) NewDBOrderRepo() models.OrdersRepo {
+func (s serverDB) NewDBOrdersRepo() models.OrdersRepo {
 	ur := new(DBOrdersRepo)
 	ur.serverDB = s
 	return ur

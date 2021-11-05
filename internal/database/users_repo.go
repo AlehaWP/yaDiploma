@@ -19,11 +19,11 @@ func (db DBUserRepo) Get(ctx context.Context, u *models.User) (bool, error) {
 	defer cancelfunc()
 	q := `SELECT COALESCE(id, 0), user_name, user_token, user_password FROM users WHERE user_token=$1 OR user_name=$2`
 	row := db.QueryRowContext(ctx, q, u.Token, u.Login)
-	if err := row.Scan(&u.UserID, &u.Login, &u.Token, &u.Password); err != nil && err != sql.ErrNoRows {
+	if err := row.Scan(&u.ID, &u.Login, &u.Token, &u.Password); err != nil && err != sql.ErrNoRows {
 		logger.Info(q, err)
 		return false, err
 	}
-	if u.UserID == 0 {
+	if u.ID == 0 {
 		return false, nil
 	}
 	if len(u.Token) == 0 {
@@ -33,7 +33,7 @@ func (db DBUserRepo) Get(ctx context.Context, u *models.User) (bool, error) {
 	return true, nil
 }
 
-func (db DBUserRepo) Add(ctx context.Context, u *models.User) (bool, error) {
+func (db DBUserRepo) Add(ctx context.Context, u *models.User) error {
 	ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
 	defer cancelfunc()
 
@@ -44,9 +44,9 @@ func (db DBUserRepo) Add(ctx context.Context, u *models.User) (bool, error) {
 
 	if err != nil {
 		logger.Info(q, err)
-		return false, err
+		return err
 	}
-	return true, nil
+	return nil
 }
 
 func (db DBUserRepo) update(ctx context.Context, u *models.User) bool {
@@ -56,7 +56,7 @@ func (db DBUserRepo) update(ctx context.Context, u *models.User) bool {
 	u.Token = encription.EncriptStr(u.Login)
 
 	q := `UPDATE users SET user_name=$2, user_password=$3, user_token=$4 WHERE ID=$4`
-	_, err := db.ExecContext(ctx, q, u.UserID, u.Login, u.Password, u.Token)
+	_, err := db.ExecContext(ctx, q, u.ID, u.Login, u.Password, u.Token)
 
 	if err != nil {
 		return false
@@ -64,8 +64,8 @@ func (db DBUserRepo) update(ctx context.Context, u *models.User) bool {
 	return true
 }
 
-func (db DBUserRepo) Del(ctx context.Context, u *models.User) (bool, error) {
-	return false, nil
+func (db DBUserRepo) Del(ctx context.Context, u *models.User) error {
+	return nil
 }
 
 func (s serverDB) NewDBUserRepo() models.UsersRepo {

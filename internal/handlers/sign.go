@@ -50,7 +50,7 @@ func HandlerRegistration(ur models.UsersRepo) http.HandlerFunc {
 			return
 		}
 
-		if ok, err := ur.Add(ctx, user); !ok || err != nil {
+		if err := ur.Add(ctx, user); err != nil {
 			logger.Info(http.StatusInternalServerError)
 			w.WriteHeader(http.StatusInternalServerError)
 			return

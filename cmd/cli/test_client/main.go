@@ -27,28 +27,60 @@ func printResult(body io.Reader, r *http.Response) {
 }
 
 func testSign(t string, log string, pas string) {
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+	fmt.Println("Тест:", t)
+	fmt.Println("Адрес", "http://localhost:8080/api/user/"+t)
 	u := uR{
 		Log: log,
 		Pas: pas,
 	}
+	fmt.Println("Данные:", u)
 	reqBody, err := json.Marshal(&u)
 	if err != nil {
 		print(err)
 	}
 	a := "http://localhost:8080/api/user/" + t
-	makeRequest(a, reqBody)
-	makeZipRequest(a, reqBody)
+	fmt.Println("\n", "Без сжатия:")
+	makePostRequest(a, "aplication/json", "", reqBody)
+	fmt.Println("\n", "Со сжатием:")
+	makeZipPostRequest(a, "aplication/json", "", reqBody)
+	fmt.Println("Окончание теста")
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
 }
 
-func makeRequest(a string, b []byte) {
-	r, err := http.Post(a, "aplication/json", bytes.NewBuffer(b)) //bytes.NewBuffer(reqBody))
+func testNewOrder(num, key string) {
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+	fmt.Println("Тест:", "NewOrder")
+	fmt.Println("Адрес", "http://localhost:8080/api/user/orders")
+
+	reqBody := []byte(num)
+	a := "http://localhost:8080/api/user/orders"
+	fmt.Println("Данные:", num, "Ключ:", key)
+	fmt.Println("\n", "Без сжатия:")
+	makePostRequest(a, "aplication/json", key, reqBody)
+	fmt.Println("\n", "Со сжатием:")
+	makeZipPostRequest(a, "aplication/json", key, reqBody)
+	fmt.Println("Окончание теста")
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+}
+
+func makePostRequest(a, t, k string, b []byte) {
+	client := &http.Client{}
+	req, _ := http.NewRequest("POST", a, bytes.NewReader(b))
+	req.Header.Add("Content-Type", t)
+	req.Header.Add("Authorization", k)
+	// r, err := http.Post(a, t, bytes.NewBuffer(b)) //bytes.NewBuffer(reqBody))
+	r, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+	}
 	if err != nil {
 		print(err)
 	}
 	printResult(r.Body, r)
 }
 
-func makeZipRequest(a string, reqBody []byte) {
+func makeZipPostRequest(a, t, k string, reqBody []byte) {
 	var b bytes.Buffer
 	gz := gzip.NewWriter(&b)
 
@@ -60,7 +92,8 @@ func makeZipRequest(a string, reqBody []byte) {
 	req, _ := http.NewRequest("POST", a, bytes.NewReader(b.Bytes()))
 	req.Header.Add("Content-Encoding", "gzip")
 	req.Header.Add("Accept-Encoding", "gzip")
-	req.Header.Add("Content-Type", "aplication/json")
+	req.Header.Add("Content-Type", t)
+	req.Header.Add("Authorization", k)
 
 	r, err := client.Do(req)
 	if err != nil {
@@ -133,6 +166,8 @@ func main() {
 	testSign("register", "Kartoha", "457457457457")
 	testSign("login", "Aleha", "123123213")
 	testSign("login", "Kartoha", "457457457457")
+	testNewOrder("4561261212345464", "Bearer 4f21d29e30e4276259d3876e112ad37c")
+	testNewOrder("4561261212345467", "Bearer 4f21d29e30e4276259d3876e112ad37c")
 	// makeGetPing()
 
 	// makePost()

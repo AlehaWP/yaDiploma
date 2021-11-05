@@ -41,7 +41,7 @@ func CheckAuthorization(ur models.UsersRepo) func(http.Handler) http.Handler {
 			}
 
 			w.Header().Add("Authorization", t)
-			ctx := context.WithValue(r.Context(), models.UKeyName, u.UserID)
+			ctx := context.WithValue(r.Context(), models.UKeyName, u.ID)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}

@@ -21,14 +21,14 @@ func (m *UsersRepoMock) Get(ctx context.Context, u *models.User) (bool, error) {
 	return args.Bool(0), args.Error(1)
 }
 
-func (m *UsersRepoMock) Add(ctx context.Context, u *models.User) (bool, error) {
+func (m *UsersRepoMock) Add(ctx context.Context, u *models.User) error {
 	args := m.Called(ctx, u)
-	return args.Bool(0), args.Error(1)
+	return args.Error(0)
 }
 
-func (m *UsersRepoMock) Del(ctx context.Context, u *models.User) (bool, error) {
+func (m *UsersRepoMock) Del(ctx context.Context, u *models.User) error {
 	args := m.Called(ctx, u)
-	return args.Bool(0), args.Error(1)
+	return args.Error(0)
 }
 
 type testHandler struct{}
