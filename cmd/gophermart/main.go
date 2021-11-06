@@ -1,11 +1,5 @@
 package main
 
-<<<<<<< HEAD
-import "fmt"
-
-func main() {
-	fmt.Println("Поехали")
-=======
 import (
 	"context"
 	"net/http"
@@ -42,5 +36,4 @@ func main() {
 
 	logger.Info("Сервер остановлен")
 
->>>>>>> balance
 }
