@@ -26,11 +26,11 @@ func CheckString(s string) bool {
 
 func Check(arr []int) bool {
 	l := len(arr)
-	controlSum := arr[l-1]
-	cArr := arr[:l-1]
+	var v int
 	var cd int
-	for i, v := range cArr {
-		if i%2 == 0 {
+	for i, j := l-1, 0; i >= 0; i, j = i-1, j+1 {
+		v = arr[i]
+		if j%2 != 0 {
 			v *= 2
 			if v > 9 {
 				v -= 9
@@ -39,5 +39,5 @@ func Check(arr []int) bool {
 		cd += v
 	}
 
-	return (cd+controlSum)%10 == 0
+	return cd%10 == 0
 }
