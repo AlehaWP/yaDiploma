@@ -75,7 +75,7 @@ func (db *DBOrdersRepo) Add(ctx context.Context, o *models.Order) error {
 }
 
 func (s serverDB) NewDBOrdersRepo() models.OrdersRepo {
-	ur := new(DBOrdersRepo)
-	ur.serverDB = s
-	return ur
+	or := new(DBOrdersRepo)
+	or.serverDB = s
+	return or
 }
