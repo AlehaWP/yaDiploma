@@ -6,7 +6,6 @@ import (
 	"time"
 
 	_ "github.com/lib/pq"
-	"github.com/pressly/goose/v3"
 
 	"github.com/AlehaWP/yaDiploma.git/internal/config"
 	"github.com/AlehaWP/yaDiploma.git/internal/models"
@@ -29,17 +28,16 @@ func (s *serverDB) CheckDBConnection(ctx context.Context) {
 }
 
 // makeMigrations start here for autotests
-func (s *serverDB) makeMigrations() {
-	logger.NewLogs()
-	p := "Миграции базы данных:"
-	logger.Info(p, "Старт")
-	// setup database
-	logger.Info(p, "Применение миграций")
-	if err := goose.Up(s.DB, "../../db/migrations"); err != nil {
-		logger.Error(p, err)
-	}
-	logger.Info(p, "Завершение") // run app
-}
+// func (s *serverDB) makeMigrations() {
+// 	p := "Миграции базы данных:"
+// 	logger.Info(p, "Старт")
+// 	// setup database
+// 	logger.Info(p, "Применение миграций")
+// 	if err := goose.Up(s.DB, "../../db/migrations"); err != nil {
+// 		logger.Error(p, err)
+// 	}
+// 	logger.Info(p, "Завершение") // run app
+// }
 
 func OpenDBConnect() models.ServerDB {
 	s := new(serverDB)
@@ -50,9 +48,9 @@ func OpenDBConnect() models.ServerDB {
 	}
 	s.DB = db
 	s.CheckDBConnection(ctx)
+	s.createTables(ctx)
 
-	// так и не заработали. На локальной машине работали
-	s.makeMigrations()
+	// s.makeMigrations()
 	return s
 }
 

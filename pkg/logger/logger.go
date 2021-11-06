@@ -30,6 +30,12 @@ func Error(v ...interface{}) {
 	errorLog.Fatal(v...)
 }
 
+func Panic(v ...interface{}) {
+	infoLog.Println("PANIC")
+	infoLog.Println(v...)
+	errorLog.Panic(v...)
+}
+
 func createLogs() {
 	var err error
 	fInfo, err = os.OpenFile("info.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)

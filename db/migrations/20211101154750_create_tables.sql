@@ -9,15 +9,15 @@ CREATE TABLE IF NOT EXISTS users (
 		date_add TIMESTAMPTZ default (NOW() at time zone 'UTC+3'));
 
 CREATE TABLE IF NOT EXISTS customers (
-        id SERIAL,
-		user_id INT PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
+        user_id INT UNIQUE,
         balance NUMERIC,
 		date_add TIMESTAMPTZ default (NOW() at time zone 'UTC+3'));
 
 CREATE TABLE IF NOT EXISTS orders (
 		id SERIAL PRIMARY KEY,
-		user_id VARCHAR(36),
-		order_id VARCHAR(50) UNIQUE,
+		user_id INT NOT NUL,
+		order_id BIGINT UNIQUE,
         accrual NUMERIC default 0,
         order_status VARCHAR(20),
 		date_add TIMESTAMPTZ default (NOW() at time zone 'UTC+3'));
