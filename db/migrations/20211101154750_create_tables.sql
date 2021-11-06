@@ -26,7 +26,8 @@ CREATE TABLE IF NOT EXISTS balance_log (
 
 
 CREATE OR REPLACE VIEW customers AS
-        select bl.user_id, sum(bl.sum_in - bl.sum_out) as current_balance, 
+        select bl.user_id, sum(bl.sum_in) as sum_in,sum(bl.sum_out) as withdrawn,
+        sum(bl.sum_in) - sum(bl.sum_out) as current_balance, 
         MAX(bl.date_add) as last_event_date from balance_log bl 
         group by bl.user_id;
 
