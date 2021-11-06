@@ -2,8 +2,11 @@ package database
 
 import (
 	"context"
+	"database/sql"
+	"time"
 
 	"github.com/AlehaWP/yaDiploma.git/internal/models"
+	"github.com/AlehaWP/yaDiploma.git/pkg/logger"
 )
 
 type DBBalanceRepo struct {
@@ -11,20 +14,19 @@ type DBBalanceRepo struct {
 }
 
 func (db *DBBalanceRepo) Get(ctx context.Context, userID int) (*models.CurrentBalance, error) {
-	// logger.Info("Проверка наличия заказа")
-	// ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
-	// defer cancelfunc()
-	// q := `SELECT id, user_id FROM orders WHERE order_id=$1`
-	// row := db.QueryRowContext(ctx, q, o.OrderID)
+	logger.Info("Проверка наличия заказа")
+	ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
+	defer cancelfunc()
+	cb := new(models.CurrentBalance)
+	cb.UserID = userID
+	q := `SELECT current_balance, withdrawn FROM cutomers WHERE user_id=$1`
+	row := db.QueryRowContext(ctx, q, userID)
 
-	// if err := row.Scan(&o.ID, &o.UserID); err != nil && err != sql.ErrNoRows {
-	// 	logger.Info(err)
-	// 	return false, err
-	// }
-	// if o.ID == 0 {
-	// 	return false, nil
-	// }
-	return nil, nil
+	if err := row.Scan(&cb.CurBalance, &cb.Withdrawn); err != nil && err != sql.ErrNoRows {
+		logger.Info(err)
+		return nil, err
+	}
+	return cb, nil
 }
 
 func (db *DBBalanceRepo) GetAll(ctx context.Context, userID int) ([]models.BalanceOut, error) {
