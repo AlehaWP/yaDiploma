@@ -55,8 +55,8 @@ func HandlersNewOrder(or models.OrdersRepo) http.HandlerFunc {
 			return
 		}
 
-		logger.Info(http.StatusOK)
-		w.WriteHeader(http.StatusOK)
+		logger.Info(http.StatusAccepted)
+		w.WriteHeader(http.StatusAccepted)
 	}
 }
 
