@@ -33,7 +33,7 @@ func (s *Server) Start(ctx context.Context) {
 		r.Post("/user/orders", handlers.HandlersNewOrder(s.NewDBOrdersRepo()))
 		r.Get("/user/orders", handlers.HandlersGetUserOrders(s.NewDBOrdersRepo()))
 		r.Get("/user/balance", handlers.HandlerGetUserBalance(s.NewDBBalanceRepo()))
-		r.Get("/api/user/balance/withdrawals", handlers.HandlerGetUserWithdrawals(s.NewDBBalanceRepo()))
+		r.Get("/user/balance/withdrawals", handlers.HandlerGetUserWithdrawals(s.NewDBBalanceRepo()))
 	})
 
 	// //r.Use(middlewares.ZipHandlerRead, middlewares.ZipHandlerWrite)

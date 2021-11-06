@@ -15,19 +15,7 @@ type uR struct {
 	Pas string `json:"password"`
 }
 
-func printResult(body io.Reader, r *http.Response) {
-	text, err := io.ReadAll(r.Body)
-	if err != nil {
-		print(err)
-	}
-	defer r.Body.Close()
-	fmt.Printf("%s\n", r.Header)
-	fmt.Printf("%s\n", text)
-	fmt.Printf("%d\n", r.StatusCode)
-}
-
 func testSign(t string, log string, pas string) {
-	fmt.Println("--------------------------------------------------------------------------------------------------------")
 	fmt.Println("Тест:", t)
 	fmt.Println("Адрес", "http://localhost:8080/api/user/"+t)
 	u := uR{
@@ -49,7 +37,6 @@ func testSign(t string, log string, pas string) {
 }
 
 func testNewOrder(num string, key string) {
-	fmt.Println("--------------------------------------------------------------------------------------------------------")
 	fmt.Println("Тест:", "NewOrder")
 	fmt.Println("Адрес", "http://localhost:8080/api/user/orders")
 
@@ -70,6 +57,36 @@ func testUserOrders(key string) {
 
 	reqBody := []byte("")
 	a := "http://localhost:8080/api/user/orders"
+	fmt.Println("Данные:", "", "Ключ:", key)
+	fmt.Println("\n", "Без сжатия:")
+	makePostRequest(a, "text/plain", key, "GET", reqBody)
+	fmt.Println("\n", "Со сжатием:")
+	makeZipPostRequest(a, "text/plain", key, "GET", reqBody)
+	fmt.Println("Окончание теста")
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+}
+
+func testUserBalance(key string) {
+	fmt.Println("Тест:", "UserOrders")
+	fmt.Println("Адрес", "http://localhost:8080/api/user/balance")
+
+	reqBody := []byte("")
+	a := "http://localhost:8080/api/user/balance"
+	fmt.Println("Данные:", "", "Ключ:", key)
+	fmt.Println("\n", "Без сжатия:")
+	makePostRequest(a, "text/plain", key, "GET", reqBody)
+	fmt.Println("\n", "Со сжатием:")
+	makeZipPostRequest(a, "text/plain", key, "GET", reqBody)
+	fmt.Println("Окончание теста")
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+}
+
+func testUserWithdrawals(key string) {
+	fmt.Println("Тест:", "UserOrders")
+	fmt.Println("Адрес", "http://localhost:8080/api/user/balance/withdrawals")
+
+	reqBody := []byte("")
+	a := "http://localhost:8080/api/user/balance/withdrawals"
 	fmt.Println("Данные:", "", "Ключ:", key)
 	fmt.Println("\n", "Без сжатия:")
 	makePostRequest(a, "text/plain", key, "GET", reqBody)
@@ -120,6 +137,17 @@ func makeZipPostRequest(address, ctype, key, rtype string, reqBody []byte) {
 		fmt.Println(err)
 	}
 	printResult(gzr, r)
+}
+
+func printResult(body io.Reader, r *http.Response) {
+	text, err := io.ReadAll(body)
+	if err != nil {
+		print(err)
+	}
+	defer r.Body.Close()
+	fmt.Printf("%s\n", r.Header)
+	fmt.Printf("%s\n", text)
+	fmt.Printf("%d\n", r.StatusCode)
 }
 
 func noRedirect(req *http.Request, via []*http.Request) error {
@@ -229,6 +257,16 @@ func main() {
 	fmt.Println("--------------------------------------------------------------------------------------------------------")
 	fmt.Println("Ожидаемый результат 200, 200", "Заказы пользователя")
 	testUserOrders("Bearer 6756be86f17b6853cb7ae5bb78729977")
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+	fmt.Println("Ожидаемый результат 200, 200", "Баланс пользователя")
+	testUserBalance("Bearer 6756be86f17b6853cb7ae5bb78729977")
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+	fmt.Println("Ожидаемый результат 200, 200", "Списания пользователя")
+	testUserWithdrawals("Bearer 6756be86f17b6853cb7ae5bb78729977")
 	fmt.Println("--------------------------------------------------------------------------------------------------------")
 
 	// makeGetPing()

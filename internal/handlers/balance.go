@@ -55,6 +55,7 @@ func HandlerGetUserWithdrawals(br models.BalanceRepo) http.HandlerFunc {
 			return
 		}
 
+		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write(res)
 	}

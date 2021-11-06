@@ -19,7 +19,7 @@ func (db *DBBalanceRepo) Get(ctx context.Context, userID int) (*models.CurrentBa
 	defer cancelfunc()
 	cb := new(models.CurrentBalance)
 	cb.UserID = userID
-	q := `SELECT current_balance, withdrawn FROM cutomers WHERE user_id=$1`
+	q := `SELECT current_balance, withdrawn FROM customers WHERE user_id=$1`
 	row := db.QueryRowContext(ctx, q, userID)
 
 	if err := row.Scan(&cb.CurBalance, &cb.Withdrawn); err != nil && err != sql.ErrNoRows {
@@ -30,33 +30,37 @@ func (db *DBBalanceRepo) Get(ctx context.Context, userID int) (*models.CurrentBa
 }
 
 func (db *DBBalanceRepo) GetAll(ctx context.Context, userID int) ([]models.BalanceOut, error) {
-	// logger.Info("Запрос заказов пользователя")
-	// ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
-	// defer cancelfunc()
-	// q := `SELECT id, order_id, accrual, order_status, date_add FROM orders WHERE user_id=$1`
-	// rows, err := db.QueryContext(ctx, q, userID)
-	// if err != nil {
-	// 	logger.Info(err)
-	// 	return nil, err
-	// }
-	// defer rows.Close()
+	logger.Info("Запрос заказов пользователя")
+	ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
+	defer cancelfunc()
+	q := `SELECT order_id, sum_out, date_add FROM balance_log WHERE user_id=$1 and sum_out != 0`
+	rows, err := db.QueryContext(ctx, q, userID)
+	if err != nil {
+		logger.Info(err)
+		return nil, err
+	}
+	defer rows.Close()
 
-	// var aOrders []models.Order
-	// for rows.Next() {
-	// 	var o models.Order
-	// 	if err := rows.Scan(&o.ID, &o.OrderID, &o.Accural, &o.Status, &o.DateAdd); err != nil {
-	// 		logger.Info(err)
-	// 		return nil, err
-	// 	}
-	// 	aOrders = append(aOrders, o)
-	// }
-	// err = rows.Err()
-	// if err != nil {
-	// 	logger.Info(err)
-	// 	return nil, err
-	// }
+	var aBalanceOut []models.BalanceOut
+	for rows.Next() {
+		var bo models.BalanceOut
+		if err := rows.Scan(&bo.OrederID, &bo.Sum, &bo.Processed); err != nil {
+			if err == sql.ErrNoRows {
+				return aBalanceOut, nil
+			}
+			logger.Info(err)
+			return nil, err
+		}
+		bo.Status = models.OrderStatusProcessed
+		aBalanceOut = append(aBalanceOut, bo)
+	}
+	err = rows.Err()
+	if err != nil {
+		logger.Info(err)
+		return nil, err
+	}
 
-	return nil, nil
+	return aBalanceOut, nil
 }
 
 func (db *DBBalanceRepo) Add(ctx context.Context, b *models.Balance) error {
