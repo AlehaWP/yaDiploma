@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strconv"
 
 	"github.com/AlehaWP/yaDiploma.git/internal/models"
 	"github.com/AlehaWP/yaDiploma.git/pkg/logger"
@@ -26,12 +27,18 @@ func HandlersNewOrder(or models.OrdersRepo) http.HandlerFunc {
 			return
 		}
 		ordNum := string(b)
+
+		order.OrderID, err = strconv.Atoi(ordNum)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
 		if ok := luhn.CheckString(ordNum); !ok {
 			logger.Info(ordNum, http.StatusUnprocessableEntity)
 			w.WriteHeader(http.StatusUnprocessableEntity)
 			return
 		}
-		order.OrderID = string(b)
 
 		finded, err := or.Get(ctx, order)
 		if err != nil {

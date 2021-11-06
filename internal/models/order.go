@@ -13,7 +13,7 @@ const (
 
 type Order struct {
 	ID      int     `json:"-"`
-	OrderID string  `json:"number"`
+	OrderID int     `json:"number"`
 	Status  Status  `json:"status"`
 	Accural float32 `json:"accrual"`
 	DateAdd string  `json:"uploaded_at"`

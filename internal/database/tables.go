@@ -19,7 +19,7 @@ func (s *serverDB) createTables(ctx context.Context) {
 									user_password VARCHAR(36),
 									user_key VARCHAR(36),
 									user_token VARCHAR(36),
-									date_add TIMESTAMPTZ default (NOW() at time zone 'UTC+3'))
+									date_add TIMESTAMPTZ(0) default (NOW() at time zone 'UTC+3'))
 	`)
 	if err != nil {
 		logger.Panic("Ошибка создания таблиц", err)
@@ -29,7 +29,7 @@ func (s *serverDB) createTables(ctx context.Context) {
 									id SERIAL PRIMARY KEY,
 									user_id INT UNIQUE,
 									balance NUMERIC default 0,
-									date_add TIMESTAMPTZ default (NOW() at time zone 'UTC+3'))
+									date_add TIMESTAMPTZ(0) default (NOW() at time zone 'UTC+3'))
 	`)
 	if err != nil {
 		logger.Panic("Ошибка создания таблиц", err)
@@ -40,7 +40,7 @@ func (s *serverDB) createTables(ctx context.Context) {
 									order_id BIGINT UNIQUE,
 									accrual NUMERIC default 0,
 									order_status VARCHAR(20),
-									date_add TIMESTAMPTZ default (NOW() at time zone 'UTC+3'))
+									date_add TIMESTAMPTZ(0) default (NOW() at time zone 'UTC+3'))
 	`)
 	if err != nil {
 		logger.Panic("Ошибка создания таблиц", err)
@@ -50,7 +50,7 @@ func (s *serverDB) createTables(ctx context.Context) {
 									user_id INT NOT NULL,
 									order_id BIGINT,
 									accrual NUMERIC,
-									date_add TIMESTAMPTZ default (NOW() at time zone 'UTC+3'))
+									date_add TIMESTAMPTZ(0) default (NOW() at time zone 'UTC+3'))
 	`)
 	if err != nil {
 		logger.Panic("Ошибка создания таблиц", err)
