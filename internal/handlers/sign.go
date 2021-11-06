@@ -57,8 +57,8 @@ func HandlerRegistration(ur models.UsersRepo) http.HandlerFunc {
 		}
 
 		w.Header().Add("Authorization", "Bearer "+user.Token)
-		w.WriteHeader(http.StatusCreated)
-		logger.Info(http.StatusCreated)
+		w.WriteHeader(http.StatusOK)
+		logger.Info(http.StatusOK)
 	}
 }
 
