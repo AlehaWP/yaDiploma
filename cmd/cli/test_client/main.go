@@ -15,6 +15,11 @@ type uR struct {
 	Pas string `json:"password"`
 }
 
+type bOut struct {
+	Order string  `json:"order"`
+	Sum   float32 `json:"sum"`
+}
+
 func testSign(t string, log string, pas string) {
 	fmt.Println("Тест:", t)
 	fmt.Println("Адрес", "http://localhost:8080/api/user/"+t)
@@ -67,7 +72,7 @@ func testUserOrders(key string) {
 }
 
 func testUserBalance(key string) {
-	fmt.Println("Тест:", "UserOrders")
+	fmt.Println("Тест:", "testUserBalance")
 	fmt.Println("Адрес", "http://localhost:8080/api/user/balance")
 
 	reqBody := []byte("")
@@ -82,7 +87,7 @@ func testUserBalance(key string) {
 }
 
 func testUserWithdrawals(key string) {
-	fmt.Println("Тест:", "UserOrders")
+	fmt.Println("Тест:", "testUserWithdrawals")
 	fmt.Println("Адрес", "http://localhost:8080/api/user/balance/withdrawals")
 
 	reqBody := []byte("")
@@ -92,6 +97,27 @@ func testUserWithdrawals(key string) {
 	makePostRequest(a, "text/plain", key, "GET", reqBody)
 	fmt.Println("\n", "Со сжатием:")
 	makeZipPostRequest(a, "text/plain", key, "GET", reqBody)
+	fmt.Println("Окончание теста")
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+}
+
+func testBalanceWithdraw(key, ord string, sum float32) {
+	fmt.Println("Тест:", "testBalanceWithdraw")
+	fmt.Println("Адрес", "http://localhost:8080/api/user/balance/withdraw")
+	bo := bOut{
+		Order: ord,
+		Sum:   sum,
+	}
+	fmt.Println("Данные:", bo)
+	reqBody, err := json.Marshal(&bo)
+	if err != nil {
+		print(err)
+	}
+	a := "http://localhost:8080/api/user/balance/withdraw"
+	fmt.Println("\n", "Без сжатия:")
+	makePostRequest(a, "aplication/json", key, "POST", reqBody)
+	fmt.Println("\n", "Со сжатием:")
+	makeZipPostRequest(a, "aplication/json", key, "POST", reqBody)
 	fmt.Println("Окончание теста")
 	fmt.Println("--------------------------------------------------------------------------------------------------------")
 }
@@ -150,59 +176,27 @@ func printResult(body io.Reader, r *http.Response) {
 	fmt.Printf("%d\n", r.StatusCode)
 }
 
-func noRedirect(req *http.Request, via []*http.Request) error {
-	return http.ErrUseLastResponse
-}
+// func makeGetPing() {
+// 	client := &http.Client{
+// 		CheckRedirect: noRedirect,
+// 	}
+// 	//req, _ := http.NewRequest("GET", "http://localhost:8080/14afc95e687fa093f0edfa25de0766cd", nil)
+// 	req, _ := http.NewRequest("GET", "http://localhost:8080/ping", nil)
+// 	// response, err := http.Get("http://localhost:8080/04f51bcd17361670c1dc6d94cbbd0efe")
 
-func makeGet(url string) {
-	client := &http.Client{
-		CheckRedirect: noRedirect,
-	}
-	req, _ := http.NewRequest("GET", url, nil)
-	//req, _ := http.NewRequest("GET", "http://localhost:8080/5ad2d1e92b0d271798b22621a54043e6", nil)
-	// response, err := http.Get("http://localhost:8080/04f51bcd17361670c1dc6d94cbbd0efe")
+// 	req.AddCookie(&http.Cookie{
+// 		Name:  "UserID",
+// 		Value: "dc3b5af8713f9d0c1f2dc708e8b2f038",
+// 	})
 
-	req.AddCookie(&http.Cookie{
-		Name:  "UserID",
-		Value: "877c34328620072ca769e960d250ac9e",
-	})
+// 	response, err := client.Do(req)
+// 	if err != nil {
+// 		fmt.Println(err.Error())
+// 	}
+// 	defer response.Body.Close()
 
-	response, err := client.Do(req)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-	defer response.Body.Close()
-
-	// text,_ := io.ReadAll(response.Header.Get("Location"))
-	text := response.Header
-	body, _ := io.ReadAll(response.Body)
-	defer response.Body.Close()
-	fmt.Printf("%s\n", text)
-	fmt.Printf("%s\n", body)
-	fmt.Printf("%d\n", response.StatusCode)
-}
-
-func makeGetPing() {
-	client := &http.Client{
-		CheckRedirect: noRedirect,
-	}
-	//req, _ := http.NewRequest("GET", "http://localhost:8080/14afc95e687fa093f0edfa25de0766cd", nil)
-	req, _ := http.NewRequest("GET", "http://localhost:8080/ping", nil)
-	// response, err := http.Get("http://localhost:8080/04f51bcd17361670c1dc6d94cbbd0efe")
-
-	req.AddCookie(&http.Cookie{
-		Name:  "UserID",
-		Value: "dc3b5af8713f9d0c1f2dc708e8b2f038",
-	})
-
-	response, err := client.Do(req)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-	defer response.Body.Close()
-
-	fmt.Printf("%d\n", response.StatusCode)
-}
+// 	fmt.Printf("%d\n", response.StatusCode)
+// }
 
 func main() {
 	fmt.Println("--------------------------------------------------------------------------------------------------------")
@@ -269,17 +263,14 @@ func main() {
 	testUserWithdrawals("Bearer 6756be86f17b6853cb7ae5bb78729977")
 	fmt.Println("--------------------------------------------------------------------------------------------------------")
 
-	// makeGetPing()
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+	fmt.Println("Ожидаемый результат 402, 402", "Списания пользователя")
+	testBalanceWithdraw("Bearer 6756be86f17b6853cb7ae5bb78729977", "", 200000)
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
 
-	// makePost()
-	// makePostApi()
-	// makePostZipApi("www.testZip3.ru/ip23123")
-	// makePostZipApi("www.testZip4.ru/ip23123")
-	// makePostApiUrls()
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
+	fmt.Println("Ожидаемый результат 200, 200", "Списания пользователя")
+	testBalanceWithdraw("Bearer 6756be86f17b6853cb7ae5bb78729977", "1230", 2500)
+	fmt.Println("--------------------------------------------------------------------------------------------------------")
 
-	// makeGet("http://localhost:8080/14afc95e687fa093f0edfa25de0766cd")
-	// makeGet("http://localhost:8080/b57b4c84086c45334df6a07dfbbf8ab9")
-	// makeGetUserUrls()
-
-	// makeDelUserUrls()
 }

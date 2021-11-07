@@ -3,20 +3,21 @@ package models
 import "context"
 
 type Balance struct {
-	BI BalanceIn
-	BO BalanceOut
-	In bool
+	UserID  int
+	OrderID string
+	SumIn   float32
+	SumOut  float32
 }
 
 type BalanceIn struct {
-	UserID   int     `json:"-"`
-	OrederID string  `json:"order"`
-	Sum      float32 `json:"accrual"`
+	UserID  int     `json:"-"`
+	OrderID string  `json:"order"`
+	Sum     float32 `json:"accrual"`
 }
 
 type BalanceOut struct {
 	UserID    int         `json:"-"`
-	OrederID  string      `json:"order"`
+	OrderID   string      `json:"order"`
 	Sum       float32     `json:"sum"`
 	Status    OrderStatus `json:"status"`
 	Processed string      `json:"processed_at"`

@@ -34,6 +34,7 @@ func (s *Server) Start(ctx context.Context) {
 		r.Get("/user/orders", handlers.HandlersGetUserOrders(s.NewDBOrdersRepo()))
 		r.Get("/user/balance", handlers.HandlerGetUserBalance(s.NewDBBalanceRepo()))
 		r.Get("/user/balance/withdrawals", handlers.HandlerGetUserWithdrawals(s.NewDBBalanceRepo()))
+		r.Post("/user/balance/withdraw", handlers.HandlerGetUserWithdraw(s.NewDBBalanceRepo()))
 	})
 
 	// //r.Use(middlewares.ZipHandlerRead, middlewares.ZipHandlerWrite)
