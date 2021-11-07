@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"strconv"
+	"time"
 
+	"github.com/AlehaWP/yaDiploma.git/internal/accrual"
 	"github.com/AlehaWP/yaDiploma.git/internal/config"
 	"github.com/AlehaWP/yaDiploma.git/internal/database"
-	"github.com/AlehaWP/yaDiploma.git/internal/server"
 	"github.com/AlehaWP/yaDiploma.git/pkg/logger"
 	"github.com/AlehaWP/yaDiploma.git/pkg/ossignal"
 )
@@ -30,10 +33,26 @@ func main() {
 
 	go ossignal.HandleQuit(cancel)
 
-	s := new(server.Server)
-	s.ServerDB = sDB
-	s.Start(ctx)
+	l := accrual.New(ctx, sDB.NewDBOrdersRepo(), sDB.NewDBBalanceRepo())
 
-	logger.Info("Сервер остановлен")
+	for i := 0; i < 1000000; i++ {
+		select {
+		case <-ctx.Done():
+			break
+		default:
+			l.Put(strconv.Itoa(i))
+		}
+	}
+
+	p := <-ctx.Done()
+	fmt.Println("Завершено")
+	fmt.Println(p)
+	time.Sleep(3 * time.Second)
+
+	// s := new(server.Server)
+	// s.ServerDB = sDB
+	// s.Start(ctx)
+
+	// logger.Info("Сервер остановлен")
 
 }
