@@ -31,6 +31,6 @@ type CurrentBalance struct {
 
 type BalanceRepo interface {
 	Add(context.Context, *Balance) error
-	Get(ctx context.Context, UserId int) (*CurrentBalance, error)
-	GetAll(ctx context.Context, UserId int) ([]BalanceOut, error)
+	Get(ctx context.Context, UserID int) (*CurrentBalance, error)
+	GetAll(ctx context.Context, UserID int) ([]BalanceOut, error)
 }
