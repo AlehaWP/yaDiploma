@@ -67,7 +67,7 @@ func (db *DBBalanceRepo) Add(ctx context.Context, b *models.Balance) error {
 	ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
 	defer cancelfunc()
 
-	q := `INSERT INTO balance_log (user_id, order_id, sum_in, sum_out) VALUES ($1,$2, $3, $4)`
+	q := `INSERT INTO balance_log (user_id, order_id, sum_in, sum_out, orders_key) VALUES ($1,$2, $3, $4) ON CONFLICT (orders_uk) DO NOTHING `
 	if _, err := db.ExecContext(ctx, q, b.UserID, b.OrderID, b.SumIn, b.SumOut); err != nil {
 		logger.Info(q, err)
 		return err

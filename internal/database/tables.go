@@ -40,9 +40,10 @@ func (s *serverDB) createTables(ctx context.Context) {
 									id SERIAL PRIMARY KEY,
 									user_id INT NOT NULL,
 									order_id VARCHAR(50),
-									sun_in NUMERIC default 0,
+									sum_in NUMERIC default 0,
 									sum_out NUMERIC default 0, 
-									date_add TIMESTAMPTZ(0) default (NOW() at time zone 'UTC+3'))
+									date_add TIMESTAMPTZ(0) default (NOW() at time zone 'UTC+3'),
+									CONSTRAINT orders_uk UNIQUE (user_id, order_id, sum_in, sum_out))
 	`)
 	if err != nil {
 		logger.Panic("Ошибка создания таблиц", err)
