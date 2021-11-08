@@ -108,7 +108,7 @@ func (db *DBOrdersRepo) Update(ctx context.Context, o *models.Order) {
 	ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
 	defer cancelfunc()
 
-	q := `UPDATE orders set order_status=$2, accural=$3 where id=$1`
+	q := `UPDATE orders set order_status=$2, accrual=$3 where id=$1`
 	_, err := db.ExecContext(ctx, q, o.ID, o.Status, o.Accural)
 
 	if err != nil {

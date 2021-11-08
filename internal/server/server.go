@@ -55,6 +55,8 @@ func (s *Server) Start(ctx context.Context) {
 	s.Handler = r
 	go s.ListenAndServe()
 
+	logger.Info("Сервер запущен")
+
 	<-ctx.Done()
 	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancelFunc()
