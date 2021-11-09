@@ -45,7 +45,7 @@ func (db *DBOrdersRepo) GetAll(ctx context.Context, userID int) ([]models.Order,
 	var aOrders []models.Order
 	for rows.Next() {
 		var o models.Order
-		if err := rows.Scan(&o.ID, &o.OrderID, &o.Accural, &o.Status, &o.DateAdd); err != nil {
+		if err := rows.Scan(&o.ID, &o.OrderID, &o.Accrual, &o.Status, &o.DateAdd); err != nil {
 			logger.Info(err)
 			return nil, err
 		}
@@ -109,7 +109,7 @@ func (db *DBOrdersRepo) Update(ctx context.Context, o *models.Order) {
 	defer cancelfunc()
 
 	q := `UPDATE orders set order_status=$2, accrual=$3 where id=$1`
-	_, err := db.ExecContext(ctx, q, o.ID, o.Status, o.Accural)
+	_, err := db.ExecContext(ctx, q, o.ID, o.Status, o.Accrual)
 
 	if err != nil {
 		logger.Info(q, err)
