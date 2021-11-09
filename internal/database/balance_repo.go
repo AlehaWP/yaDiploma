@@ -19,7 +19,10 @@ func (db *DBBalanceRepo) Get(ctx context.Context, userID int) (*models.CurrentBa
 	defer cancelfunc()
 	cb := new(models.CurrentBalance)
 	cb.UserID = userID
-	q := `SELECT current_balance, withdrawn FROM customers WHERE user_id=$1`
+	// q := `SELECT current_balance, withdrawn FROM customers WHERE user_id=$1`
+
+	q := `select sum(bl.sum_in) - sum(bl.sum_out) as current_balance, sum(bl.sum_out) as withdrawn
+			from balance_log bl WHERE user_id=$1`
 	row := db.QueryRowContext(ctx, q, userID)
 
 	if err := row.Scan(&cb.CurBalance, &cb.Withdrawn); err != nil && err != sql.ErrNoRows {
