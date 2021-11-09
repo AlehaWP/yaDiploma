@@ -5,6 +5,7 @@ import "context"
 type OrderStatus string
 
 const (
+	OrderStatusRegistered OrderStatus = "REGISTERED"
 	OrderStatusProcessed  OrderStatus = "PROCESSED"
 	OrderStatusProcessing OrderStatus = "PROCESSING"
 	OrderStatusInvalid    OrderStatus = "INVALID"

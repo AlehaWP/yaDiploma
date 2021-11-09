@@ -109,8 +109,9 @@ func BeginSurvey(ctx context.Context, a string, o models.OrdersRepo, b models.Ba
 			return
 		default:
 			l.getNumForSurvey(ctx, models.OrderStatusNew)
+			l.getNumForSurvey(ctx, models.OrderStatusRegistered)
 			l.getNumForSurvey(ctx, models.OrderStatusProcessing)
-			time.Sleep(2 * time.Second)
+			time.Sleep(1 * time.Second)
 		}
 	}
 
