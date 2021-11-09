@@ -32,6 +32,9 @@ func (s *Server) Start(ctx context.Context) {
 		r.Use(middlewares.CheckAuthorization(s.NewDBUserRepo()))
 		r.Post("/user/orders", handlers.HandlersNewOrder(s.NewDBOrdersRepo()))
 		r.Get("/user/orders", handlers.HandlersGetUserOrders(s.NewDBOrdersRepo()))
+		r.Get("/user/balance", handlers.HandlerGetUserBalance(s.NewDBBalanceRepo()))
+		r.Get("/user/balance/withdrawals", handlers.HandlerGetUserWithdrawals(s.NewDBBalanceRepo()))
+		r.Post("/user/balance/withdraw", handlers.HandlerGetUserWithdraw(s.NewDBBalanceRepo()))
 	})
 
 	// //r.Use(middlewares.ZipHandlerRead, middlewares.ZipHandlerWrite)
@@ -51,6 +54,8 @@ func (s *Server) Start(ctx context.Context) {
 	logger.Info("Старт сервера по адресу", config.Cfg.ServAddr())
 	s.Handler = r
 	go s.ListenAndServe()
+
+	logger.Info("Сервер запущен")
 
 	<-ctx.Done()
 	ctx, cancelFunc := context.WithTimeout(context.Background(), time.Second*5)

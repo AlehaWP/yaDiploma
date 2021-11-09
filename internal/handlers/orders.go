@@ -26,7 +26,7 @@ func HandlersNewOrder(or models.OrdersRepo) http.HandlerFunc {
 			return
 		}
 		ordNum := string(b)
-		if ok := luhn.CheckString(ordNum); !ok {
+		if ok := luhn.CheckString(ordNum); len(ordNum) == 0 || !ok {
 			logger.Info(ordNum, http.StatusUnprocessableEntity)
 			w.WriteHeader(http.StatusUnprocessableEntity)
 			return

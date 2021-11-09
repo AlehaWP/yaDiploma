@@ -45,7 +45,37 @@ func (db *DBOrdersRepo) GetAll(ctx context.Context, userID int) ([]models.Order,
 	var aOrders []models.Order
 	for rows.Next() {
 		var o models.Order
-		if err := rows.Scan(&o.ID, &o.OrderID, &o.Accural, &o.Status, &o.DateAdd); err != nil {
+		if err := rows.Scan(&o.ID, &o.OrderID, &o.Accrual, &o.Status, &o.DateAdd); err != nil {
+			logger.Info(err)
+			return nil, err
+		}
+		aOrders = append(aOrders, o)
+	}
+	err = rows.Err()
+	if err != nil {
+		logger.Info(err)
+		return nil, err
+	}
+
+	return aOrders, nil
+}
+
+func (db *DBOrdersRepo) GetAllStatus(ctx context.Context, st models.OrderStatus) ([]*models.Order, error) {
+	// logger.Info("Запрос заказов в статусе:", st)
+	ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
+	defer cancelfunc()
+	q := `SELECT id, user_id, order_status, order_id FROM orders WHERE order_status=$1`
+	rows, err := db.QueryContext(ctx, q, st)
+	if err != nil {
+		logger.Info(err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var aOrders []*models.Order
+	for rows.Next() {
+		o := new(models.Order)
+		if err := rows.Scan(&o.ID, &o.UserID, &o.Status, &o.OrderID); err != nil {
 			logger.Info(err)
 			return nil, err
 		}
@@ -74,8 +104,20 @@ func (db *DBOrdersRepo) Add(ctx context.Context, o *models.Order) error {
 	return nil
 }
 
+func (db *DBOrdersRepo) Update(ctx context.Context, o *models.Order) {
+	ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
+	defer cancelfunc()
+
+	q := `UPDATE orders set order_status=$2, accrual=$3 where id=$1`
+	_, err := db.ExecContext(ctx, q, o.ID, o.Status, o.Accrual)
+
+	if err != nil {
+		logger.Info(q, err)
+	}
+}
+
 func (s serverDB) NewDBOrdersRepo() models.OrdersRepo {
-	ur := new(DBOrdersRepo)
-	ur.serverDB = s
-	return ur
+	or := new(DBOrdersRepo)
+	or.serverDB = s
+	return or
 }

@@ -66,7 +66,7 @@ func (c *Config) setDefault() {
 	c.servAddr = "localhost:8080"
 	c.dbConnString = "user=kseikseich dbname=yad sslmode=disable"
 	//c.dbConnString = "postgresql://postgres:postgres@postgres/praktikum?sslmode=disable"
-	c.accuralAddress = "http://localhost:8081"
+	c.accuralAddress = "http://localhost:8082"
 }
 
 //setFlags for get options from console to default application options.
