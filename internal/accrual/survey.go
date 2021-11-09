@@ -42,7 +42,6 @@ func (l *listOrders) sendData(ctx context.Context, o *models.Order) {
 		logger.Info(http.StatusInternalServerError, "Ошибка обработки запроса сервером начислений", o)
 		return
 	}
-
 	if resp.StatusCode == http.StatusOK {
 		b, err := io.ReadAll(resp.Body)
 		if err != nil {

@@ -61,7 +61,7 @@ func (db *DBOrdersRepo) GetAll(ctx context.Context, userID int) ([]models.Order,
 }
 
 func (db *DBOrdersRepo) GetAllStatus(ctx context.Context, st models.OrderStatus) ([]*models.Order, error) {
-	logger.Info("Запрос заказов в статусе:", st)
+	// logger.Info("Запрос заказов в статусе:", st)
 	ctx, cancelfunc := context.WithTimeout(ctx, 5*time.Second)
 	defer cancelfunc()
 	q := `SELECT id, user_id, order_status, order_id FROM orders WHERE order_status=$1`
