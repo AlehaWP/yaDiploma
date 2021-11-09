@@ -30,7 +30,7 @@ func HandlerGetUserBalance(br models.BalanceRepo) http.HandlerFunc {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-
+		w.Header().Add("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write(res)
 	}
