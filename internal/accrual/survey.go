@@ -60,7 +60,7 @@ func (l *listOrders) sendData(ctx context.Context, o *models.Order) {
 		if o.Status != oOut.Status {
 			o.OrderID = oOut.OrderID
 			o.Status = oOut.Status
-			o.Accural = oOut.Accural
+			o.Accrual = oOut.Accrual
 
 			l.or.Update(ctx, o)
 
@@ -68,7 +68,7 @@ func (l *listOrders) sendData(ctx context.Context, o *models.Order) {
 				bl := new(models.Balance)
 				bl.UserID = o.UserID
 				bl.OrderID = o.OrderID
-				bl.SumIn = o.Accural
+				bl.SumIn = o.Accrual
 				err = l.br.Add(ctx, bl)
 				if err != nil {
 					logger.Info("Ошибка добавления баланса в лог", bl)

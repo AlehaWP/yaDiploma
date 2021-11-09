@@ -15,7 +15,7 @@ type Order struct {
 	ID      int         `json:"-"`
 	OrderID string      `json:"number"`
 	Status  OrderStatus `json:"status"`
-	Accural float32     `json:"accrual"`
+	Accrual float32     `json:"accrual"`
 	DateAdd string      `json:"uploaded_at"`
 	UserID  int         `json:"-"`
 }
@@ -23,7 +23,7 @@ type Order struct {
 type OrderFromAccuyral struct {
 	OrderID string      `json:"order"`
 	Status  OrderStatus `json:"status"`
-	Accural float32     `json:"accrual"`
+	Accrual float32     `json:"accrual,omitempty"`
 }
 
 type OrdersRepo interface {
