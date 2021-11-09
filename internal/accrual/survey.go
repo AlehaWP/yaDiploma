@@ -27,8 +27,15 @@ func (l *listOrders) Put(ctx context.Context, o *models.Order) {
 	}
 }
 
-func (l *listOrders) sendData(ctx context.Context, o *models.Order) {
-	resp, err := http.Get("http://localhost:8082/api/orders/" + o.OrderID)
+func IncludeTrailingBackSlash(st string) string {
+	if st[len(st)-1:] != "/" {
+		return st + "/"
+	}
+	return st
+}
+
+func (l *listOrders) sendData(ctx context.Context, o *models.Order, address string) {
+	resp, err := http.Get(IncludeTrailingBackSlash(address) + "api/orders/" + o.OrderID)
 	if err != nil {
 		logger.Info("Error", "Ошибка выполнения запроса", err)
 		return
@@ -77,7 +84,7 @@ func (l *listOrders) sendData(ctx context.Context, o *models.Order) {
 	}
 }
 
-func BeginSurvey(ctx context.Context, a string, o models.OrdersRepo, b models.BalanceRepo, numOfWorkers int) {
+func BeginSurvey(ctx context.Context, address string, o models.OrdersRepo, b models.BalanceRepo, numOfWorkers int) {
 	var wg sync.WaitGroup
 
 	jobCh := make(chan *models.Order, 100)
@@ -94,7 +101,7 @@ func BeginSurvey(ctx context.Context, a string, o models.OrdersRepo, b models.Ba
 
 		go func() {
 			for job := range jobCh {
-				l.sendData(ctx, job)
+				l.sendData(ctx, job, address)
 			}
 			wg.Done()
 		}()
