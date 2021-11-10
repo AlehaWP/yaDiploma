@@ -37,15 +37,15 @@ func main() {
 		wg.Done()
 	}()
 
+	l := accrual.NewSurveyAccrual(ctx, sDB.NewDBOrdersRepo(), sDB.NewDBBalanceRepo(), 10)
 	go func() {
-		accrual.BeginSurvey(ctx, config.Cfg.AccuralAddress(), sDB.NewDBOrdersRepo(), sDB.NewDBBalanceRepo(), 10)
+		l.GetOrdersForSurvey(ctx)
 		wg.Done()
 	}()
 
 	s := new(server.Server)
 	s.ServerDB = sDB
 	s.Start(ctx)
-	logger.Info("Сервер запущен")
 	wg.Wait()
 	logger.Info("Сервер остановлен")
 

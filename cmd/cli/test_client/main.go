@@ -34,11 +34,10 @@ func testSign(t string, log string, pas string) {
 	}
 	a := "http://localhost:8080/api/user/" + t
 	fmt.Println("\n", "Без сжатия:")
-	makePostRequest(a, "application/json", "", "POST", reqBody)
+	makeRequest(a, "application/json", "", "POST", reqBody)
 	fmt.Println("\n", "Со сжатием:")
 	makeZipPostRequest(a, "application/json", "", "POST", reqBody)
 	fmt.Println("Окончание теста")
-	fmt.Println("--------------------------------------------------------------------------------------------------------")
 }
 
 func testNewOrder(num string, key string) {
@@ -49,11 +48,10 @@ func testNewOrder(num string, key string) {
 	a := "http://localhost:8080/api/user/orders"
 	fmt.Println("Данные:", num, "Ключ:", key)
 	fmt.Println("\n", "Без сжатия:")
-	makePostRequest(a, "text/plain", key, "POST", reqBody)
+	makeRequest(a, "text/plain", key, "POST", reqBody)
 	fmt.Println("\n", "Со сжатием:")
 	makeZipPostRequest(a, "text/plain", key, "POST", reqBody)
 	fmt.Println("Окончание теста")
-	fmt.Println("--------------------------------------------------------------------------------------------------------")
 }
 
 func testUserOrders(key string) {
@@ -64,11 +62,10 @@ func testUserOrders(key string) {
 	a := "http://localhost:8080/api/user/orders"
 	fmt.Println("Данные:", "", "Ключ:", key)
 	fmt.Println("\n", "Без сжатия:")
-	makePostRequest(a, "text/plain", key, "GET", reqBody)
+	makeRequest(a, "text/plain", key, "GET", reqBody)
 	fmt.Println("\n", "Со сжатием:")
 	makeZipPostRequest(a, "text/plain", key, "GET", reqBody)
 	fmt.Println("Окончание теста")
-	fmt.Println("--------------------------------------------------------------------------------------------------------")
 }
 
 func testUserBalance(key string) {
@@ -79,11 +76,10 @@ func testUserBalance(key string) {
 	a := "http://localhost:8080/api/user/balance"
 	fmt.Println("Данные:", "", "Ключ:", key)
 	fmt.Println("\n", "Без сжатия:")
-	makePostRequest(a, "text/plain", key, "GET", reqBody)
+	makeRequest(a, "text/plain", key, "GET", reqBody)
 	fmt.Println("\n", "Со сжатием:")
 	makeZipPostRequest(a, "text/plain", key, "GET", reqBody)
 	fmt.Println("Окончание теста")
-	fmt.Println("--------------------------------------------------------------------------------------------------------")
 }
 
 func testUserWithdrawals(key string) {
@@ -94,11 +90,10 @@ func testUserWithdrawals(key string) {
 	a := "http://localhost:8080/api/user/balance/withdrawals"
 	fmt.Println("Данные:", "", "Ключ:", key)
 	fmt.Println("\n", "Без сжатия:")
-	makePostRequest(a, "text/plain", key, "GET", reqBody)
+	makeRequest(a, "text/plain", key, "GET", reqBody)
 	fmt.Println("\n", "Со сжатием:")
 	makeZipPostRequest(a, "text/plain", key, "GET", reqBody)
 	fmt.Println("Окончание теста")
-	fmt.Println("--------------------------------------------------------------------------------------------------------")
 }
 
 func testBalanceWithdraw(key, ord string, sum float32) {
@@ -115,11 +110,10 @@ func testBalanceWithdraw(key, ord string, sum float32) {
 	}
 	a := "http://localhost:8080/api/user/balance/withdraw"
 	fmt.Println("\n", "Без сжатия:")
-	makePostRequest(a, "application/json", key, "POST", reqBody)
+	makeRequest(a, "application/json", key, "POST", reqBody)
 	fmt.Println("\n", "Со сжатием:")
 	makeZipPostRequest(a, "application/json", key, "POST", reqBody)
 	fmt.Println("Окончание теста")
-	fmt.Println("--------------------------------------------------------------------------------------------------------")
 }
 
 func testAddOrderToAccrual(ord string) {
@@ -143,11 +137,10 @@ func testAddOrderToAccrual(ord string) {
 			}
 	`)
 	fmt.Println("\n", "Без сжатия:")
-	makePostRequest(a, "application/json", "", "POST", reqBody)
+	makeRequest(a, "application/json", "", "POST", reqBody)
 	// fmt.Println("\n", "Со сжатием:")
 	// makeZipPostRequest(a, "application/json", "", "GET", reqBody)
 	fmt.Println("Окончание теста")
-	fmt.Println("--------------------------------------------------------------------------------------------------------")
 }
 
 func testAccrual(ord string) {
@@ -157,11 +150,10 @@ func testAccrual(ord string) {
 	a := "http://localhost:8082/api/orders/" + ord
 	reqBody := []byte("")
 	fmt.Println("\n", "Без сжатия:")
-	makePostRequest(a, "application/json", "", "GET", reqBody)
+	makeRequest(a, "application/json", "", "GET", reqBody)
 	// fmt.Println("\n", "Со сжатием:")
 	// makeZipPostRequest(a, "application/json", "", "GET", reqBody)
 	fmt.Println("Окончание теста")
-	fmt.Println("--------------------------------------------------------------------------------------------------------")
 }
 
 func testAccrualPost(ord string) {
@@ -171,14 +163,13 @@ func testAccrualPost(ord string) {
 	a := "http://localhost:8082/api/orders"
 	reqBody := []byte(`{"order": "` + ord + `"}`)
 	fmt.Println("\n", "Без сжатия:")
-	makePostRequest(a, "application/json", "", "POST", reqBody)
+	makeRequest(a, "application/json", "", "POST", reqBody)
 	// fmt.Println("\n", "Со сжатием:")
 	// makeZipPostRequest(a, "application/json", "", "GET", reqBody)
 	fmt.Println("Окончание теста")
-	fmt.Println("--------------------------------------------------------------------------------------------------------")
 }
 
-func makePostRequest(address, ctype, key, rtype string, b []byte) {
+func makeRequest(address, ctype, key, rtype string, b []byte) {
 	client := &http.Client{}
 	req, _ := http.NewRequest(rtype, address, bytes.NewReader(b))
 	req.Header.Add("Content-Type", ctype)
