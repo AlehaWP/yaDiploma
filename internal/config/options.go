@@ -15,7 +15,7 @@ var once sync.Once
 type Config struct {
 	servAddr       string
 	dbConnString   string
-	accuralAddress string
+	accrualAddress string
 	appDir         string
 }
 
@@ -31,14 +31,14 @@ func (c Config) ProgramPath() string {
 	return c.appDir
 }
 
-func (c Config) AccuralAddress() string {
-	return c.accuralAddress
+func (c Config) AccrualAddress() string {
+	return c.accrualAddress
 }
 
 type EnvOptions struct {
 	ServAddr       string `env:"RUN_ADDRESS"`
 	DBConnString   string `env:"DATABASE_URI"`
-	AccuralAddress string `env:"ACCRUAL_SYSTEM_ADDRESS"`
+	AccrualAddress string `env:"ACCRUAL_SYSTEM_ADDRESS"`
 }
 
 //checkEnv for get options from env to default application options.
@@ -56,8 +56,8 @@ func (c *Config) checkEnv() {
 	if len(e.DBConnString) != 0 {
 		c.dbConnString = e.DBConnString
 	}
-	if len(e.AccuralAddress) != 0 {
-		c.accuralAddress = e.AccuralAddress
+	if len(e.AccrualAddress) != 0 {
+		c.accrualAddress = e.AccrualAddress
 	}
 
 }
@@ -66,14 +66,14 @@ func (c *Config) setDefault() {
 	c.servAddr = "localhost:8080"
 	c.dbConnString = "user=kseikseich dbname=yad sslmode=disable"
 	//c.dbConnString = "postgresql://postgres:postgres@postgres/praktikum?sslmode=disable"
-	c.accuralAddress = "http://localhost:8082"
+	c.accrualAddress = "http://localhost:8082"
 }
 
 //setFlags for get options from console to default application options.
 func (c *Config) setFlags() {
 	flag.StringVar(&c.servAddr, "a", c.servAddr, "a server address string")
 	flag.StringVar(&c.dbConnString, "d", c.dbConnString, "a db connection string")
-	flag.StringVar(&c.accuralAddress, "r", c.accuralAddress, "a accural system address")
+	flag.StringVar(&c.accrualAddress, "r", c.accrualAddress, "a accrual system address")
 	flag.Parse()
 }
 

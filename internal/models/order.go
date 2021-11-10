@@ -21,7 +21,7 @@ type Order struct {
 	UserID  int         `json:"-"`
 }
 
-type OrderFromAccuyral struct {
+type OrderFromAccrual struct {
 	OrderID string      `json:"order"`
 	Status  OrderStatus `json:"status"`
 	Accrual float32     `json:"accrual,omitempty"`
