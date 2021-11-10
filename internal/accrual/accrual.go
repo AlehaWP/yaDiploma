@@ -8,6 +8,8 @@ import (
 	"github.com/AlehaWP/yaDiploma.git/internal/models"
 	"github.com/AlehaWP/yaDiploma.git/pkg/client"
 	"github.com/AlehaWP/yaDiploma.git/pkg/logger"
+	"github.com/AlehaWP/yaDiploma.git/pkg/utility"
+	"github.com/AlehaWP/yaDiploma.git/pkg/workers"
 )
 
 // servAddress string
@@ -57,31 +59,42 @@ func (o *ordersDB) updateOrderDB(ctx context.Context, or *models.Order, oOut *mo
 type Accrual struct {
 	servAddress string
 	odb         *ordersDB
-	l           *WorkersPool
+	w           *workers.WorkersPool
 }
 
-func (a *Accrual) includeTrailingBackSlash(st string) string {
-	if st[len(st)-1:] != "/" {
-		return st + "/"
-	}
-	return st
-}
-
-func (a *Accrual) Put(ctx context.Context, arr []*models.Order) {
+func (a *Accrual) PutArr(ctx context.Context, arr []*models.Order) {
 	for _, v := range arr {
-		a.l.Put(ctx, v)
+		a.w.Put(a.getOrderFromAccrual(ctx, v))
 	}
 }
 
-func (a *Accrual) GetOrdersForSurvey(ctx context.Context) {
-	arr := a.odb.getOrders(ctx, models.OrderStatusNew)
-	a.Put(ctx, arr)
+func (a *Accrual) Put(ctx context.Context, o *models.Order) {
+	a.w.Put(a.getOrderFromAccrual(ctx, o))
 }
 
-func (a *Accrual) getOrderFromAccrual() func(context.Context, interface{}) {
-	return func(ctx context.Context, o interface{}) {
+func (a *Accrual) getOrdersForSurvey(ctx context.Context, st models.OrderStatus) {
+	arr := a.odb.getOrders(ctx, st)
+	a.PutArr(ctx, arr)
+}
 
-		orderForUpdate := o.(*models.Order)
+func (a *Accrual) GetOrdersForSurveyFromDB(ctx context.Context) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		default:
+			a.getOrdersForSurvey(ctx, models.OrderStatusNew)
+			a.getOrdersForSurvey(ctx, models.OrderStatusRegistered)
+			a.getOrdersForSurvey(ctx, models.OrderStatusProcessing)
+		}
+	}
+}
+
+func (a *Accrual) getOrderFromAccrual(ctx context.Context, o *models.Order) func() {
+	return func() {
+		orderForUpdate := o
 		oIn := new(models.OrderFromAccrual)
 		b, ok := client.MakeRequest("GET", a.servAddress+"api/orders/"+orderForUpdate.OrderID, "", "", nil)
 		if !ok {
@@ -97,15 +110,15 @@ func (a *Accrual) getOrderFromAccrual() func(context.Context, interface{}) {
 	}
 }
 
-func NewSurveyAccrual(ctx context.Context, or models.OrdersRepo, br models.BalanceRepo, qtyChan int) *Accrual {
+func NewSurveyAccrual(or models.OrdersRepo, br models.BalanceRepo, w *workers.WorkersPool) *Accrual {
 	ordersDB := &ordersDB{
 		or: or,
 		br: br,
 	}
 	a := new(Accrual)
 	a.odb = ordersDB
-	a.servAddress = a.includeTrailingBackSlash(config.Cfg.AccrualAddress())
-	a.l = NewWorkersPool(ctx, a.getOrderFromAccrual(), qtyChan)
+	a.servAddress = utility.IncludeTrailingBackSlash(config.Cfg.AccrualAddress())
+	a.w = w
 
 	return a
 }

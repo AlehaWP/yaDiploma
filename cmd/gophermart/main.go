@@ -11,6 +11,7 @@ import (
 	"github.com/AlehaWP/yaDiploma.git/internal/server"
 	"github.com/AlehaWP/yaDiploma.git/pkg/logger"
 	"github.com/AlehaWP/yaDiploma.git/pkg/ossignal"
+	"github.com/AlehaWP/yaDiploma.git/pkg/workers"
 )
 
 func HelloWorld(w http.ResponseWriter, r *http.Request) {
@@ -37,9 +38,12 @@ func main() {
 		wg.Done()
 	}()
 
-	l := accrual.NewSurveyAccrual(ctx, sDB.NewDBOrdersRepo(), sDB.NewDBBalanceRepo(), 10)
+	w := workers.NewWorkersPool(10)
+	defer w.Close()
+
+	l := accrual.NewSurveyAccrual(sDB.NewDBOrdersRepo(), sDB.NewDBBalanceRepo(), w)
 	go func() {
-		l.GetOrdersForSurvey(ctx)
+		l.GetOrdersForSurveyFromDB(ctx)
 		wg.Done()
 	}()
 
